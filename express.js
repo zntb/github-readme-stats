@@ -2,6 +2,7 @@ import "dotenv/config";
 import statsCard from "./api/index.js";
 import repoCard from "./api/pin.js";
 import langCard from "./api/top-langs.js";
+import streakCard from "./api/streak.js";
 import wakatimeCard from "./api/wakatime.js";
 import gistCard from "./api/gist.js";
 import urlBuilder from "./api/url-builder.js";
@@ -13,6 +14,7 @@ const router = express.Router();
 router.get("/", statsCard);
 router.get("/pin", repoCard);
 router.get("/top-langs", langCard);
+router.get("/streak", streakCard);
 router.get("/wakatime", wakatimeCard);
 router.get("/gist", gistCard);
 

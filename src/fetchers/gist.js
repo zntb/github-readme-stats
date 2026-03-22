@@ -53,6 +53,10 @@ const fetcher = async (variables, token) => {
  * @returns {string} Primary language.
  */
 const calculatePrimaryLanguage = (files) => {
+  if (!files || files.length === 0) {
+    return "Unknown";
+  }
+
   /** @type {Record<string, number>} */
   const languages = {};
 
@@ -66,7 +70,7 @@ const calculatePrimaryLanguage = (files) => {
     }
   }
 
-  let primaryLanguage = Object.keys(languages)[0];
+  let primaryLanguage = Object.keys(languages)[0] || "Unknown";
   for (const language in languages) {
     if (languages[language] > languages[primaryLanguage]) {
       primaryLanguage = language;
@@ -77,7 +81,7 @@ const calculatePrimaryLanguage = (files) => {
 };
 
 /**
- * @typedef {import('./types').GistData} GistData Gist data.
+ * @typedef {import('./types.js').GistData} GistData Gist data.
  */
 
 /**

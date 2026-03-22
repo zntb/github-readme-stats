@@ -45,22 +45,22 @@ const guardAccess = ({ res, id, type, colors }) => {
     return { isPassed: false, result };
   }
 
-  if (
-    type === "username" &&
-    currentWhitelist === undefined &&
-    blacklist.includes(id)
-  ) {
-    const result = res.send(
-      renderError({
-        message: BLACKLISTED_MESSAGE,
-        secondaryMessage: "Please deploy your own instance",
-        renderOptions: {
-          ...colors,
-          show_repo_link: false,
-        },
-      }),
-    );
-    return { isPassed: false, result };
+  // Check blacklist only when whitelist is not defined (undefined)
+  // When whitelist is an empty array or defined, blacklist is not checked
+  if (currentWhitelist === undefined) {
+    if (type === "username" && blacklist.includes(id)) {
+      const result = res.send(
+        renderError({
+          message: BLACKLISTED_MESSAGE,
+          secondaryMessage: "Please deploy your own instance",
+          renderOptions: {
+            ...colors,
+            show_repo_link: false,
+          },
+        }),
+      );
+      return { isPassed: false, result };
+    }
   }
 
   return { isPassed: true };
