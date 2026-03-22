@@ -80,13 +80,17 @@
 - [WakaTime Stats Card](#wakatime-stats-card)
     - [Options](#options-3)
     - [Demo](#demo-3)
+- [Activity Streak Card](#activity-streak-card)
+    - [Usage](#usage-3)
+    - [Options](#options-4)
+    - [Demo](#demo-4)
 - [All Demos](#all-demos)
   - [Quick Tip (Align The Cards)](#quick-tip-align-the-cards)
     - [Stats and top languages cards](#stats-and-top-languages-cards)
     - [Pinning repositories](#pinning-repositories)
-- [Deploy on your own](#deploy-on-your-own)
-  - [GitHub Actions (Recommended)](#github-actions-recommended)
-  - [Self-hosted (Vercel/Other) (Recommended)](#self-hosted-vercelother-recommended)
+- [Deploy on your own (recommended)](#deploy-on-your-own-recommended)
+  - [GitHub Actions](#github-actions)
+  - [Self-hosted (Vercel/Other)](#self-hosted-vercelother)
     - [First step: get your Personal Access Token (PAT)](#first-step-get-your-personal-access-token-pat)
     - [On Vercel](#on-vercel)
     - [:film\_projector: Check Out Step By Step Video Tutorial By @codeSTACKr](#film_projector-check-out-step-by-step-video-tutorial-by-codestackr)
@@ -669,6 +673,43 @@ You can customize the appearance and behavior of the WakaTime stats card using t
 *   Compact layout
 
 ![Harlok's WakaTime stats](https://github-readme-stats.vercel.app/api/wakatime?username=ffflabs\&layout=compact)
+
+***
+
+# Activity Streak Card
+
+The Activity Streak Card shows your GitHub contribution streaks including current streak, longest streak, and total contributing days.
+
+Change the `?username=` value to your GitHub username.
+
+```md
+[![Streak](https://github-readme-stats.vercel.app/api/streak?username=anuraghazra)](https://github.com/anuraghazra/github-readme-stats)
+```
+
+### Usage
+
+You can use the Activity Streak Card in your readme by adding the following markdown:
+
+```md
+[![Streak](https://github-readme-stats.vercel.app/api/streak?username=your-username)]
+```
+
+### Options
+
+You can customize the appearance and behavior of the Activity Streak Card using the [common options](#common-options) and exclusive options listed in the table below.
+
+| Name | Description | Type | Default value |
+| --- | --- | --- | --- |
+| `hide_title` | Hides the title of your card. | boolean | `false` |
+| `hide_border` | Hides the border of your card. | boolean | `false` |
+| `custom_title` | Sets a custom title for the card. | string | `Activity Streak` |
+
+> [!WARNING]
+> Custom title should be URI-escaped, as specified in [Percent Encoding](https://en.wikipedia.org/wiki/Percent-encoding) (i.e: `My Streak` should become `My%20Streak`). You can use [urlencoder.org](https://www.urlencoder.org/) to help you do this automatically.
+
+### Demo
+
+![Activity Streak](https://github-readme-stats.vercel.app/api/streak?username=anuraghazra)
 
 ***
 
