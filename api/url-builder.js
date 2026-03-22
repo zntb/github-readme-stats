@@ -854,7 +854,14 @@ export default async (req, res) => {
       
       if (valid) {
         openBtn.href = url;
-        previewFrame.innerHTML = '<img src="' + url + '" alt="Card Preview" onerror="this.parentNode.innerHTML=\'<span class=\\'placeholder\\'>Error loading preview. Check username.</span>\'">';
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Card Preview';
+        img.onerror = function() {
+          this.parentNode.innerHTML = '<span class="placeholder">Error loading preview. Check username.</span>';
+        };
+        previewFrame.innerHTML = '';
+        previewFrame.appendChild(img);
       } else {
         openBtn.href = '#';
         previewFrame.innerHTML = '<span class="placeholder">Configure your card to see the preview</span>';
