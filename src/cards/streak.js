@@ -3,7 +3,7 @@
 import { Card } from "../common/Card.js";
 import { getCardColors } from "../common/color.js";
 import { kFormatter } from "../common/fmt.js";
-import { flexLayout, iconWithLabel } from "../common/render.js";
+import { flexLayout } from "../common/render.js";
 import { icons } from "../common/icons.js";
 
 const CARD_MIN_WIDTH = 300;
@@ -31,6 +31,31 @@ const CARD_DEFAULT_WIDTH = 300;
  *   totalContributingDays: number;
  * }} StreakData
  */
+
+/**
+ * Creates a stat display with icon and value.
+ *
+ * @param {string} icon The SVG icon.
+ * @param {number|string} value The value to display.
+ * @param {string} testid The test id.
+ * @returns {string} The stat item SVG.
+ */
+const createStatItem = (icon, value, testid) => {
+  const iconSvg = `
+    <svg
+      class="icon"
+      y="-12"
+      viewBox="0 0 16 16"
+      version="1.1"
+      width="16"
+      height="16"
+    >
+      ${icon}
+    </svg>
+  `;
+  const text = `<text data-testid="${testid}" class="stat">${value}</text>`;
+  return flexLayout({ items: [iconSvg, text], gap: 20 }).join("");
+};
 
 /**
  * Renders the streak card.
@@ -91,20 +116,14 @@ const renderStreakCard = (streakData, options = {}) => {
     desc: `Current streak: ${currentStreak} days, Longest streak: ${longestStreak} days, Total contributing days: ${totalContributingDays}`,
   });
 
-  // Create stat items
+  // Create stat items using a custom function that doesn't filter out 0 values
   const statItems = [
-    iconWithLabel(
-      icons.commits,
-      kFormatter(currentStreak),
-      "currentStreak",
-      16,
-    ),
-    iconWithLabel(icons.star, kFormatter(longestStreak), "longestStreak", 16),
-    iconWithLabel(
+    createStatItem(icons.commits, kFormatter(currentStreak), "currentStreak"),
+    createStatItem(icons.star, kFormatter(longestStreak), "longestStreak"),
+    createStatItem(
       icons.contribs,
       kFormatter(totalContributingDays),
       "totalContributingDays",
-      16,
     ),
   ];
 
@@ -117,9 +136,13 @@ const renderStreakCard = (streakData, options = {}) => {
   card.setCSS(`
     .stat {
       font: 800 15px "Segoe UI", Ubuntu, "Helvetica Neue", Sans-Serif, sans-serif;
+      fill: ${textColor};
     }
     .stat-bold {
       font: 800 20px "Segoe UI", Ubuntu, "Helvetica Neue", Sans-Serif, sans-serif;
+    }
+    .icon {
+      fill: ${iconColor};
     }
     @keyframes group_animation {
       transform: translateY(0);
