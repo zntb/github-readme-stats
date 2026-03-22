@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    /* JavaScript Support */
+    "allowJs": true,
+    "checkJs": true,
+    "maxNodeModuleJsDepth": 0,
+
+    /* Emit - disabled because this is JavaScript project */
+    "noEmit": true,
+
+    /* Type Checking */
+    "strict": false,
+    "ignoreDeprecations": "6.0",
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "useUnknownInCatchVariables": false,
+    "alwaysStrict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+
+    /* Module Resolution */
+    "resolveJsonModule": true,
+    "allowUmdGlobalAccess": false,
+
+    /* Maps */
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.js",
+    "src/**/*.d.ts",
+    "api/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests",
+    "themes"
+  ]
+}
