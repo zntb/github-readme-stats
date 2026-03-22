@@ -18,7 +18,7 @@ router.get("/gist", gistCard);
 
 app.use("/api", router);
 
-// URL Builder route
+// URL Builder route (for local development)
 app.get("/url-builder", urlBuilder);
 
 const port = process.env.PORT || process.env.port || 9000;
