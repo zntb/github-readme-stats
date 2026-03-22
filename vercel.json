@@ -5,6 +5,12 @@
       "maxDuration": 10
     }
   },
+  "rewrites": [
+    {
+      "source": "/url-builder",
+      "destination": "/api/url-builder.js"
+    }
+  ],
   "redirects": [
     {
       "source": "/",
