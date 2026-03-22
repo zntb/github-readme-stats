@@ -8,7 +8,7 @@
   "rewrites": [
     {
       "source": "/url-builder",
-      "destination": "/api/url-builder.js"
+      "destination": "/api/url-builder"
     }
   ],
   "redirects": [
