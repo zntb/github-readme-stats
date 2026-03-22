@@ -3,6 +3,10 @@
     "api/*.js": {
       "memory": 128,
       "maxDuration": 10
+    },
+    "api/url-builder.js": {
+      "memory": 128,
+      "maxDuration": 10
     }
   },
   "rewrites": [
