@@ -47,7 +47,7 @@ const fetcher = (variables, token) => {
 };
 
 /**
- * @typedef {import("./types").TopLangData} TopLangData Top languages data.
+ * @typedef {import("./types.js").TopLangData} TopLangData Top languages data.
  */
 
 /**
@@ -120,11 +120,10 @@ const fetchTopLanguages = async (
       let langSize = prev.size;
 
       // if we already have the language in the accumulator
-      // & the current language name is same as previous name
       // add the size to the language size and increase repoCount.
-      if (acc[prev.node.name] && prev.node.name === acc[prev.node.name].name) {
+      if (acc[prev.node.name]) {
         langSize = prev.size + acc[prev.node.name].size;
-        repoCount += 1;
+        repoCount = acc[prev.node.name].count + 1;
       } else {
         // reset repoCount to 1
         // language must exist in at least one repo to be detected

@@ -222,7 +222,7 @@ const totalCommitsFetcher = async (username) => {
  * @param {boolean} include_discussions Include discussions.
  * @param {boolean} include_discussions_answers Include discussions answers.
  * @param {number|undefined} commits_year Year to count total commits
- * @returns {Promise<import("./types").StatsData>} Stats data.
+ * @returns {Promise<import("./types.js").StatsData>} Stats data.
  */
 const fetchStats = async (
   username,
