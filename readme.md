@@ -48,6 +48,10 @@
 <details>
 <summary>Table of contents (Click to show)</summary>
 
+- [Interactive URL Builder](#interactive-url-builder)
+    - [Features](#features)
+    - [Usage](#usage)
+    - [Quick Start](#quick-start)
 - [GitHub Stats Card](#github-stats-card)
     - [Hiding individual stats](#hiding-individual-stats)
     - [Showing additional individual stats](#showing-additional-individual-stats)
@@ -56,15 +60,15 @@
     - [Themes](#themes)
     - [Customization](#customization)
 - [GitHub Extra Pins](#github-extra-pins)
-    - [Usage](#usage)
+    - [Usage](#usage-1)
     - [Options](#options)
     - [Demo](#demo)
 - [GitHub Gist Pins](#github-gist-pins)
-    - [Usage](#usage-1)
+    - [Usage](#usage-2)
     - [Options](#options-1)
     - [Demo](#demo-1)
 - [Top Languages Card](#top-languages-card)
-    - [Usage](#usage-2)
+    - [Usage](#usage-3)
     - [Options](#options-2)
     - [Language stats algorithm](#language-stats-algorithm)
     - [Exclude individual repositories](#exclude-individual-repositories)
@@ -81,7 +85,7 @@
     - [Options](#options-3)
     - [Demo](#demo-3)
 - [Activity Streak Card](#activity-streak-card)
-    - [Usage](#usage-3)
+    - [Usage](#usage-4)
     - [Options](#options-4)
     - [Demo](#demo-4)
 - [All Demos](#all-demos)
@@ -109,6 +113,44 @@
 
 > [!IMPORTANT]
 > We're a small team, and to prioritize, we rely on upvotes :+1:. We use the Top Issues dashboard for tracking community demand (see [#1935](https://github.com/anuraghazra/github-readme-stats/issues/1935)). Do not hesitate to upvote the issues and pull requests you are interested in. We will work on the most upvoted first.
+
+# Interactive URL Builder
+
+Building custom card URLs just got easier! Use our interactive URL Builder to generate your card URLs with a live preview.
+
+[![URL Builder Preview](https://user-images.githubusercontent.com/placeholder.svg)](https://github-readme-stats.vercel.app/url-builder)
+
+### Features
+
+- **Live Preview**: See your card update in real-time as you configure options
+- **All Card Types**: Support for Stats, Pin, Top Languages, Streak, Gist, and Wakatime cards
+- **40+ Themes**: Choose from built-in themes like dark, radical, gruvbox, tokyonight, dracula, and more
+- **Custom Colors**: Fine-tune title, icon, text, background, and border colors
+- **Advanced Options**: Border radius, card width, cache settings, locale, and animations
+
+### Usage
+
+Visit the URL Builder at:
+
+```
+https://github-readme-stats.vercel.app/url-builder
+```
+
+Or run locally:
+
+```bash
+npm run build  # or npm start
+# Then open http://localhost:9000/url-builder
+```
+
+### Quick Start
+
+1. Select your card type from the tabs
+2. Enter your GitHub username
+3. Choose a theme or customize colors
+4. Copy the generated URL and add it to your README!
+
+---
 
 # GitHub Stats Card
 
