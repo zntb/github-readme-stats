@@ -4,5 +4,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[javascript]": {
         "editor.tabSize": 2
-    }
+    },
+    "snyk.advanced.autoSelectOrganization": true
 }
