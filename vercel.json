@@ -5,10 +5,16 @@
       "maxDuration": 10
     }
   },
+  "rewrites": [
+    {
+      "source": "/url-builder",
+      "destination": "/api/url-builder.js"
+    }
+  ],
   "redirects": [
     {
       "source": "/",
-      "destination": "https://github.com/anuraghazra/github-readme-stats"
+      "destination": "https://github.com/zntb/github-readme-stats"
     }
   ]
 }
