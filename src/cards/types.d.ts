@@ -65,3 +65,14 @@ export type WakaTimeOptions = CommonOptions & {
 export type GistCardOptions = CommonOptions & {
   show_owner: boolean;
 };
+
+export type StreakCardOptions = CommonOptions & {
+  hide_title: boolean;
+  custom_title: string;
+};
+
+export type StreakData = {
+  currentStreak: number;
+  longestStreak: number;
+  totalContributingDays: number;
+};
