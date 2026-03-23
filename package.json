@@ -12,6 +12,7 @@
     "lint": "eslint",
     "test": "node node_modules/jest/bin/jest.js --coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
+    "bench": "node node_modules/jest/bin/jest.js --config jest.bench.config.js",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
