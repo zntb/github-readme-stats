@@ -29,11 +29,16 @@ describe("Test renderRepoCard", () => {
 
   it("should display username in title when show_owner is true", () => {
     document.body.innerHTML = renderRepoCard(repo, { show_owner: true });
-    expect(document.getElementsByClassName("header")[0]).toHaveTextContent("anuraghazra/convoychat");
+    expect(document.getElementsByClassName("header")[0]).toHaveTextContent(
+      "anuraghazra/convoychat",
+    );
   });
 
   it("should trim header if too long", () => {
-    document.body.innerHTML = renderRepoCard({ ...repo, name: "some-really-long-repo-name-for-test-purposes" });
+    document.body.innerHTML = renderRepoCard({
+      ...repo,
+      name: "some-really-long-repo-name-for-test-purposes",
+    });
     expect(document.getElementsByClassName("header")[0].textContent).toBe(
       "some-really-long-repo-name-for-test...",
     );
@@ -59,6 +64,8 @@ describe("Test renderRepoCard", () => {
 
   it("should fallback to default description when undefined", () => {
     document.body.innerHTML = renderRepoCard({ ...repo, description: undefined });
-    expect(document.getElementsByClassName("description")[0]).toHaveTextContent("No description provided");
+    expect(document.getElementsByClassName("description")[0]).toHaveTextContent(
+      "No description provided",
+    );
   });
 });

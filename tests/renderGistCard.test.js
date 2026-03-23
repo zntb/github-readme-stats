@@ -75,7 +75,9 @@ describe("test renderGistCard", () => {
 
   it("should render custom colors", () => {
     document.body.innerHTML = renderGistCard(data, {
-      title_color: "5a0", text_color: "9991", bg_color: "252525",
+      title_color: "5a0",
+      text_color: "9991",
+      bg_color: "252525",
     });
     expect(queryByTestId(document.body, "card-bg")).toHaveAttribute("fill", "#252525");
   });

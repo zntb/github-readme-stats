@@ -4,7 +4,9 @@ import "@testing-library/jest-dom";
 import { renderStreakCard } from "../src/cards/streak.js";
 
 const streakData = {
-  currentStreak: 5, longestStreak: 30, totalContributingDays: 150,
+  currentStreak: 5,
+  longestStreak: 30,
+  totalContributingDays: 150,
 };
 
 describe("Test renderStreakCard", () => {

@@ -26,9 +26,7 @@ const wrapTextMultiline = (text, width = 59, maxLines = 3) => {
   const fullWidthComma = "，";
   const encoded = encodeHTML(text);
   const isChinese = encoded.includes(fullWidthComma);
-  let wrapped = isChinese
-    ? encoded.split(fullWidthComma)
-    : wrap(encoded, { width }).split("\n");
+  let wrapped = isChinese ? encoded.split(fullWidthComma) : wrap(encoded, { width }).split("\n");
   const lines = wrapped.map((line) => line.trim()).slice(0, maxLines);
   if (wrapped.length > maxLines) lines[maxLines - 1] += "...";
   return lines.filter(Boolean);

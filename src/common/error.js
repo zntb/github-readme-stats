@@ -38,4 +38,10 @@ const retrieveSecondaryMessage = (err) =>
     ? err.secondaryMessage
     : undefined;
 
-export { CustomError, MissingParamError, SECONDARY_ERROR_MESSAGES, TRY_AGAIN_LATER, retrieveSecondaryMessage };
+export {
+  CustomError,
+  MissingParamError,
+  SECONDARY_ERROR_MESSAGES,
+  TRY_AGAIN_LATER,
+  retrieveSecondaryMessage,
+};

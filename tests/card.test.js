@@ -71,19 +71,29 @@ describe("Card", () => {
   it("main-card-body should have proper position with title visible", () => {
     const card = new Card({ height: 200 });
     document.body.innerHTML = card.render("");
-    expect(queryByTestId(document.body, "main-card-body")).toHaveAttribute("transform", "translate(0, 55)");
+    expect(queryByTestId(document.body, "main-card-body")).toHaveAttribute(
+      "transform",
+      "translate(0, 55)",
+    );
   });
 
   it("main-card-body should have proper position after title is hidden", () => {
     const card = new Card({ height: 200 });
     card.setHideTitle(true);
     document.body.innerHTML = card.render("");
-    expect(queryByTestId(document.body, "main-card-body")).toHaveAttribute("transform", "translate(0, 25)");
+    expect(queryByTestId(document.body, "main-card-body")).toHaveAttribute(
+      "transform",
+      "translate(0, 25)",
+    );
   });
 
   it("should render with correct colors", () => {
     const { titleColor, textColor, iconColor, bgColor } = getCardColors({
-      title_color: "f00", icon_color: "0f0", text_color: "00f", bg_color: "fff", theme: "default",
+      title_color: "f00",
+      icon_color: "0f0",
+      text_color: "00f",
+      bg_color: "fff",
+      theme: "default",
     });
     const card = new Card({ height: 200, colors: { titleColor, textColor, iconColor, bgColor } });
     document.body.innerHTML = card.render("");
@@ -95,12 +105,18 @@ describe("Card", () => {
 
   it("should render gradient backgrounds", () => {
     const { titleColor, textColor, iconColor, bgColor } = getCardColors({
-      title_color: "f00", icon_color: "0f0", text_color: "00f",
-      bg_color: "90,fff,000,f00", theme: "default",
+      title_color: "f00",
+      icon_color: "0f0",
+      text_color: "00f",
+      bg_color: "90,fff,000,f00",
+      theme: "default",
     });
     const card = new Card({ height: 200, colors: { titleColor, textColor, iconColor, bgColor } });
     document.body.innerHTML = card.render("");
     expect(queryByTestId(document.body, "card-bg")).toHaveAttribute("fill", "url(#gradient)");
-    expect(document.querySelector("defs #gradient")).toHaveAttribute("gradientTransform", "rotate(90)");
+    expect(document.querySelector("defs #gradient")).toHaveAttribute(
+      "gradientTransform",
+      "rotate(90)",
+    );
   });
 });

@@ -8,8 +8,24 @@ const wakaTimeData = {
   is_other_usage_visible: true,
   range: "last_7_days",
   languages: [
-    { digital: "0:19", hours: 0, minutes: 19, name: "Other", percent: 60, text: "19 mins", total_seconds: 1170 },
-    { digital: "0:01", hours: 0, minutes: 1, name: "TypeScript", percent: 40, text: "1 min", total_seconds: 83 },
+    {
+      digital: "0:19",
+      hours: 0,
+      minutes: 19,
+      name: "Other",
+      percent: 60,
+      text: "19 mins",
+      total_seconds: 1170,
+    },
+    {
+      digital: "0:01",
+      hours: 0,
+      minutes: 1,
+      name: "TypeScript",
+      percent: 40,
+      text: "1 min",
+      total_seconds: 83,
+    },
   ],
 };
 
@@ -49,10 +65,7 @@ describe("Test Render WakaTime Card", () => {
   });
 
   it("should show no coding activity message when languages is undefined", () => {
-    document.body.innerHTML = renderWakatimeCard(
-      { ...wakaTimeData, languages: undefined },
-      {},
-    );
+    document.body.innerHTML = renderWakatimeCard({ ...wakaTimeData, languages: undefined }, {});
     expect(document.querySelector(".stat").textContent).toBe("No coding activity this week");
   });
 
