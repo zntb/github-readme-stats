@@ -82,10 +82,41 @@ https://github-readme-stats.vercel.app/url-builder
 **Features:**
 - Live card preview that updates as you type
 - Supports all six card types (Stats, Pin, Top Languages, Streak, WakaTime, Gist)
-- 30+ built-in themes in a dropdown
+- 53 built-in themes in a dropdown
+- 8 gradient background templates + custom gradient builder with angle control
 - Color pickers with hex input for full customization
 - Advanced options: border radius, card width, locale, cache TTL, animations
 - One-click copy of the generated URL and Markdown snippet
+
+### Card Type Options
+
+Each card type has specific configuration options:
+
+| Card Type | Required Fields | Available Options |
+|---|---|---|
+| Stats | username | custom_title, hide, show (prs_merged, prs_merged_percentage, reviews, discussions_started, discussions_answered, contribs) |
+| Pin | username, repo | custom_title, show_owner |
+| Top Languages | username | custom_title, layout (normal/compact/donut/donut-vertical/pie), langs_count |
+| Streak | username | custom_title |
+| Gist | id | show_owner |
+| Wakatime | username | custom_title, layout (normal/compact) |
+
+### Gradient Backgrounds
+
+The URL Builder includes 8 preset gradient templates:
+
+| Template | Colors | Angle |
+|---|---|---|
+| Sunset | #ff6b6b, #feca57, #ff9ff3 | 135° |
+| Ocean | #2b5876, #4e4376 | 45° |
+| Midnight | #0f2027, #203a43, #2c5364 | 90° |
+| Aurora | #00c9ff, #92fe9d | 45° |
+| Candy | #d53369, #daae51 | 45° |
+| Deep Sea | #1a2988, #26d0ce | 90° |
+| Purple Love | #cc2b5e, #753a88 | 45° |
+| Flamingo | #d53369, #daae51 | 45° |
+
+You can also customize colors and angle (0-360°) for fully personalized gradients.
 
 ---
 
