@@ -1,21 +1,66 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 type CardType = "stats" | "pin" | "top-langs" | "streak" | "gist" | "wakatime";
 
 const THEMES = [
-  "default", "dark", "radical", "merko", "gruvbox", "gruvbox_light",
-  "tokyonight", "onedark", "dracula", "monokai", "nightowl", "buefy",
-  "blue-green", "algolia", "great-gatsby", "ayu-mirage", "midnight-purple",
-  "calm", "flag-india", "omni", "cobalt", "synthwave", "highcontrast",
-  "prussian", "maroongold", "yeblu", "blueberry", "slateorange", "kacho_ga",
-  "outrun", "ocean_dark", "city_lights", "github_dark", "github_dark_dimmed",
-  "discord_old_blurple", "aura_dark", "panda", "noctis_minimus", "cobalt2",
-  "swift", "aura", "apprentice", "moltack", "codeSTACKr", "rose_pine",
-  "catppuccin_latte", "catppuccin_mocha", "date_night", "one_dark_pro",
-  "rose", "holi", "neon", "blue_navy", "calm_pink", "ambient_gradient",
+  "default",
+  "dark",
+  "algolia",
+  "ambient_gradient",
+  "apprentice",
+  "aura",
+  "aura_dark",
+  "ayu-mirage",
+  "blue-green",
+  "blue_navy",
+  "blueberry",
+  "buefy",
+  "calm",
+  "calm_pink",
+  "catppuccin_latte",
+  "catppuccin_mocha",
+  "city_lights",
+  "cobalt",
+  "cobalt2",
+  "codeSTACKr",
+  "date_night",
+  "discord_old_blurple",
+  "dracula",
+  "flag-india",
+  "github_dark",
+  "github_dark_dimmed",
+  "great-gatsby",
+  "gruvbox",
+  "gruvbox_light",
+  "highcontrast",
+  "holi",
+  "kacho_ga",
+  "maroongold",
+  "merko",
+  "midnight-purple",
+  "moltack",
+  "monokai",
+  "neon",
+  "nightowl",
+  "noctis_minimus",
+  "ocean_dark",
+  "omni",
+  "one_dark_pro",
+  "onedark",
+  "outrun",
+  "panda",
+  "prussian",
+  "radical",
+  "rose",
+  "rose_pine",
+  "slateorange",
+  "swift",
+  "synthwave",
+  "tokyonight",
   "transparent",
+  "yeblu",
 ];
 
 interface ColorConfig {
@@ -38,6 +83,7 @@ export default function URLBuilder() {
   });
   const [advanced, setAdvanced] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Card-specific state
   const [statsUsername, setStatsUsername] = useState("");
@@ -73,6 +119,10 @@ export default function URLBuilder() {
   const [hideBorder, setHideBorder] = useState(false);
   const [hideTitle, setHideTitle] = useState(false);
   const [disableAnimations, setDisableAnimations] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const buildUrl = useCallback((): { url: string; valid: boolean } => {
     const params = new URLSearchParams();
@@ -152,11 +202,37 @@ export default function URLBuilder() {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
     const url = valid ? `${baseUrl}${endpoint}?${params.toString()}` : "";
     return { url, valid };
-  }, [cardType, theme, colors, borderRadius, cardWidth, cacheSeconds, locale,
-    hideBorder, hideTitle, disableAnimations, statsUsername, statsTitle,
-    statsHide, statsShow, pinUsername, pinRepo, pinTitle, pinShowOwner,
-    langsUsername, langsTitle, langsLayout, langsCount, streakUsername,
-    streakTitle, gistId, gistShowOwner, wakaUsername, wakaTitle, wakaLayout]);
+  }, [
+    cardType,
+    theme,
+    colors,
+    borderRadius,
+    cardWidth,
+    cacheSeconds,
+    locale,
+    hideBorder,
+    hideTitle,
+    disableAnimations,
+    statsUsername,
+    statsTitle,
+    statsHide,
+    statsShow,
+    pinUsername,
+    pinRepo,
+    pinTitle,
+    pinShowOwner,
+    langsUsername,
+    langsTitle,
+    langsLayout,
+    langsCount,
+    streakUsername,
+    streakTitle,
+    gistId,
+    gistShowOwner,
+    wakaUsername,
+    wakaTitle,
+    wakaLayout,
+  ]);
 
   const { url, valid } = buildUrl();
 
@@ -168,435 +244,686 @@ export default function URLBuilder() {
     }
   };
 
-  const tabs: { id: CardType; label: string }[] = [
-    { id: "stats", label: "Stats" },
-    { id: "pin", label: "Pin" },
-    { id: "top-langs", label: "Top Languages" },
-    { id: "streak", label: "Streak" },
-    { id: "gist", label: "Gist" },
-    { id: "wakatime", label: "Wakatime" },
+  const tabs: { id: CardType; label: string; icon: string }[] = [
+    { id: "stats", label: "Stats", icon: "📊" },
+    { id: "pin", label: "Pin", icon: "📌" },
+    { id: "top-langs", label: "Languages", icon: "🌐" },
+    { id: "streak", label: "Streak", icon: "🔥" },
+    { id: "gist", label: "Gist", icon: "📝" },
+    { id: "wakatime", label: "Wakatime", icon: "⏱️" },
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
-      {/* Header */}
-      <header className="text-center py-8 px-4">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text)" }}>
-          GitHub Readme Stats — URL Builder
-        </h1>
-        <p style={{ color: "var(--text-muted)" }}>
-          Build your custom card URL with live preview
-        </p>
+    <div className="min-h-screen">
+      {/* Hero Header */}
+      <header className="relative pt-16 pb-12 text-center animate-fade-in-up container-centered">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto">
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-300% animate-shimmer"
+            style={{ animationDuration: "8s" }}
+          >
+            GitHub Readme Stats
+          </h1>
+          <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto">
+            Craft beautiful, personalized stats cards for your GitHub profile with live preview
+          </p>
+        </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 pb-12" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
-        {/* Configuration Panel */}
-        <div>
-          {/* Card Type Tabs */}
-          <div
-            className="rounded-lg p-6 mb-4"
-            style={{ background: "var(--card-bg)", border: "1px solid var(--border)" }}
-          >
-            <h2 className="text-xl font-semibold mb-4" style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem" }}>
-              Card Type
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCardType(tab.id)}
-                  className="px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  style={{
-                    background: cardType === tab.id ? "var(--primary)" : "var(--card-bg)",
-                    color: cardType === tab.id ? "white" : "var(--text)",
-                    border: `1px solid ${cardType === tab.id ? "var(--primary)" : "var(--border)"}`,
-                    cursor: "pointer",
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Stats Options */}
-            {cardType === "stats" && (
-              <div className="space-y-4">
-                <FormGroup label="Username *">
-                  <input
-                    className="input-field"
-                    placeholder="Your GitHub username"
-                    value={statsUsername}
-                    onChange={(e) => setStatsUsername(e.target.value)}
-                  />
-                </FormGroup>
-                <FormGroup label="Custom Title">
-                  <input
-                    className="input-field"
-                    placeholder="e.g., My GitHub Stats"
-                    value={statsTitle}
-                    onChange={(e) => setStatsTitle(e.target.value)}
-                  />
-                </FormGroup>
-                <FormGroup label="Hide Stats (comma-separated)">
-                  <input
-                    className="input-field"
-                    placeholder="e.g., prs,issues"
-                    value={statsHide}
-                    onChange={(e) => setStatsHide(e.target.value)}
-                  />
-                </FormGroup>
-                <FormGroup label="Additional Stats">
-                  <div className="flex flex-wrap gap-3">
-                    {["prs_merged", "prs_merged_percentage", "reviews", "discussions_started", "discussions_answered"].map((s) => (
-                      <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={statsShow.includes(s)}
-                          onChange={(e) => {
-                            if (e.target.checked) setStatsShow([...statsShow, s]);
-                            else setStatsShow(statsShow.filter((x) => x !== s));
-                          }}
-                        />
-                        {s.replace(/_/g, " ")}
-                      </label>
-                    ))}
-                  </div>
-                </FormGroup>
-              </div>
-            )}
-
-            {/* Pin Options */}
-            {cardType === "pin" && (
-              <div className="space-y-4">
-                <FormGroup label="Username *">
-                  <input className="input-field" placeholder="Your GitHub username" value={pinUsername} onChange={(e) => setPinUsername(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Repository *">
-                  <input className="input-field" placeholder="e.g., github-readme-stats" value={pinRepo} onChange={(e) => setPinRepo(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Custom Title">
-                  <input className="input-field" placeholder="e.g., My Repo" value={pinTitle} onChange={(e) => setPinTitle(e.target.value)} />
-                </FormGroup>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={pinShowOwner} onChange={(e) => setPinShowOwner(e.target.checked)} />
-                  Show Owner
-                </label>
-              </div>
-            )}
-
-            {/* Top Languages Options */}
-            {cardType === "top-langs" && (
-              <div className="space-y-4">
-                <FormGroup label="Username *">
-                  <input className="input-field" placeholder="Your GitHub username" value={langsUsername} onChange={(e) => setLangsUsername(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Custom Title">
-                  <input className="input-field" placeholder="e.g., Most Used Languages" value={langsTitle} onChange={(e) => setLangsTitle(e.target.value)} />
-                </FormGroup>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                  <FormGroup label="Layout">
-                    <select className="input-field" value={langsLayout} onChange={(e) => setLangsLayout(e.target.value)}>
-                      <option value="normal">Normal</option>
-                      <option value="compact">Compact</option>
-                      <option value="donut">Donut</option>
-                      <option value="donut-vertical">Donut Vertical</option>
-                      <option value="pie">Pie</option>
-                    </select>
-                  </FormGroup>
-                  <FormGroup label="Lang Count">
-                    <input className="input-field" type="number" min="1" max="20" value={langsCount} onChange={(e) => setLangsCount(e.target.value)} />
-                  </FormGroup>
-                </div>
-              </div>
-            )}
-
-            {/* Streak Options */}
-            {cardType === "streak" && (
-              <div className="space-y-4">
-                <FormGroup label="Username *">
-                  <input className="input-field" placeholder="Your GitHub username" value={streakUsername} onChange={(e) => setStreakUsername(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Custom Title">
-                  <input className="input-field" placeholder="e.g., Activity Streak" value={streakTitle} onChange={(e) => setStreakTitle(e.target.value)} />
-                </FormGroup>
-              </div>
-            )}
-
-            {/* Gist Options */}
-            {cardType === "gist" && (
-              <div className="space-y-4">
-                <FormGroup label="Gist ID *">
-                  <input className="input-field" placeholder="e.g., bbfce31e0217a3689c8d961a356cb10d" value={gistId} onChange={(e) => setGistId(e.target.value)} />
-                </FormGroup>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={gistShowOwner} onChange={(e) => setGistShowOwner(e.target.checked)} />
-                  Show Owner
-                </label>
-              </div>
-            )}
-
-            {/* Wakatime Options */}
-            {cardType === "wakatime" && (
-              <div className="space-y-4">
-                <FormGroup label="Wakatime Username *">
-                  <input className="input-field" placeholder="Your Wakatime username" value={wakaUsername} onChange={(e) => setWakaUsername(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Custom Title">
-                  <input className="input-field" placeholder="e.g., WakaTime Stats" value={wakaTitle} onChange={(e) => setWakaTitle(e.target.value)} />
-                </FormGroup>
-                <FormGroup label="Layout">
-                  <select className="input-field" value={wakaLayout} onChange={(e) => setWakaLayout(e.target.value)}>
-                    <option value="normal">Normal</option>
-                    <option value="compact">Compact</option>
-                  </select>
-                </FormGroup>
-              </div>
-            )}
-          </div>
-
-          {/* Appearance */}
-          <div
-            className="rounded-lg p-6 mb-4"
-            style={{ background: "var(--card-bg)", border: "1px solid var(--border)" }}
-          >
-            <h2 className="text-xl font-semibold mb-4" style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem" }}>
-              Appearance
-            </h2>
-
-            <FormGroup label="Theme">
-              <select
-                className="input-field"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
+      <main className="container-centered pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+          {/* Configuration Panel */}
+          <div className="space-y-8">
+            {/* Card Type Tabs */}
+            <section
+              className="glass-card animate-fade-in-up animate-delay-100"
+              style={{ marginTop: "3rem", marginBottom: "3rem", padding: "2rem" }}
+            >
+              <h2
+                className="text-xl font-semibold flex items-center gap-2"
+                style={{ marginBottom: "2rem" }}
               >
-                <option value="">Custom Colors</option>
-                {THEMES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </FormGroup>
+                <span className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full" />
+                Card Type
+              </h2>
 
-            {!theme && (
-              <div className="mt-4 space-y-3">
-                {(Object.entries({
-                  titleColor: "Title Color",
-                  iconColor: "Icon Color",
-                  textColor: "Text Color",
-                  bgColor: "Background",
-                  borderColor: "Border Color",
-                }) as [keyof ColorConfig, string][]).map(([key, label]) => (
-                  <div key={key} style={{ display: "grid", gridTemplateColumns: "120px 1fr", alignItems: "center", gap: "0.75rem" }}>
-                    <span className="text-sm font-medium">{label}</span>
-                    <div className="flex gap-2 items-center">
-                      <input
-                        type="color"
-                        value={colors[key]}
-                        onChange={(e) => setColors({ ...colors, [key]: e.target.value })}
-                        className="rounded border"
-                        style={{ width: 40, height: 32, padding: 2, cursor: "pointer", border: "1px solid var(--border)" }}
-                      />
+              {/* Tab buttons - responsive grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setCardType(tab.id)}
+                    className={`
+                      relative px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                      flex items-center justify-center gap-2 group
+                      ${
+                        cardType === tab.id
+                          ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 scale-[1.02]"
+                          : "bg-bg-tertiary text-text-secondary hover:bg-bg-secondary hover:text-text border border-card-border"
+                      }
+                    `}
+                  >
+                    <span className="text-lg">{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    {cardType === tab.id && (
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 animate-pulse" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Card-specific options */}
+              <div className="space-y-6">
+                {/* Stats Options */}
+                {cardType === "stats" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup label="GitHub Username *" description="Enter your GitHub username">
                       <input
                         type="text"
-                        value={colors[key]}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setColors({ ...colors, [key]: v });
-                        }}
-                        className="input-field"
-                        style={{ fontFamily: "monospace", fontSize: "0.875rem" }}
+                        placeholder="e.g., octocat"
+                        value={statsUsername}
+                        onChange={(e) => setStatsUsername(e.target.value)}
+                        className="font-mono"
                       />
+                    </FormGroup>
+                    <FormGroup label="Custom Title" description="Personalize your card title">
+                      <input
+                        type="text"
+                        placeholder="e.g., My GitHub Stats"
+                        value={statsTitle}
+                        onChange={(e) => setStatsTitle(e.target.value)}
+                      />
+                    </FormGroup>
+                    <FormGroup label="Hide Stats" description="Comma-separated list to hide">
+                      <input
+                        type="text"
+                        placeholder="e.g., prs,issues,commits"
+                        value={statsHide}
+                        onChange={(e) => setStatsHide(e.target.value)}
+                        className="font-mono text-sm"
+                      />
+                    </FormGroup>
+                    <FormGroup
+                      label="Additional Stats"
+                      description="Select extra metrics to display"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[
+                          "prs_merged",
+                          "prs_merged_percentage",
+                          "reviews",
+                          "discussions_started",
+                          "discussions_answered",
+                          "contribs",
+                        ].map((s) => (
+                          <label
+                            key={s}
+                            className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer group"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={statsShow.includes(s)}
+                              onChange={(e) => {
+                                if (e.target.checked) setStatsShow([...statsShow, s]);
+                                else setStatsShow(statsShow.filter((x) => x !== s));
+                              }}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-sm text-text-secondary group-hover:text-text transition-colors">
+                              {s.replace(/_/g, " ")}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </FormGroup>
+                  </div>
+                )}
+
+                {/* Pin Options */}
+                {cardType === "pin" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup label="GitHub Username *" description="Repository owner">
+                      <input
+                        type="text"
+                        placeholder="e.g., octocat"
+                        value={pinUsername}
+                        onChange={(e) => setPinUsername(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+                    <FormGroup label="Repository *" description="Repository name">
+                      <input
+                        type="text"
+                        placeholder="e.g., hello-world"
+                        value={pinRepo}
+                        onChange={(e) => setPinRepo(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+                    <FormGroup label="Custom Title" description="Override repository name">
+                      <input
+                        type="text"
+                        placeholder="e.g., My Awesome Project"
+                        value={pinTitle}
+                        onChange={(e) => setPinTitle(e.target.value)}
+                      />
+                    </FormGroup>
+                    <label className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={pinShowOwner}
+                        onChange={(e) => setPinShowOwner(e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-text-secondary">Show repository owner</span>
+                    </label>
+                  </div>
+                )}
+
+                {/* Top Languages Options */}
+                {cardType === "top-langs" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup
+                      label="GitHub Username *"
+                      description="User whose languages to display"
+                    >
+                      <input
+                        type="text"
+                        placeholder="e.g., octocat"
+                        value={langsUsername}
+                        onChange={(e) => setLangsUsername(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+                    <FormGroup label="Custom Title" description="Card title override">
+                      <input
+                        type="text"
+                        placeholder="e.g., Top Languages"
+                        value={langsTitle}
+                        onChange={(e) => setLangsTitle(e.target.value)}
+                      />
+                    </FormGroup>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormGroup label="Layout" description="Visual arrangement">
+                        <select
+                          value={langsLayout}
+                          onChange={(e) => setLangsLayout(e.target.value)}
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="compact">Compact</option>
+                          <option value="donut">Donut</option>
+                          <option value="donut-vertical">Donut Vertical</option>
+                          <option value="pie">Pie</option>
+                        </select>
+                      </FormGroup>
+                      <FormGroup label="Languages Count" description="Number to display (1-20)">
+                        <input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={langsCount}
+                          onChange={(e) => setLangsCount(e.target.value)}
+                          className="font-mono"
+                        />
+                      </FormGroup>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                )}
 
-            {/* Advanced Toggle */}
-            <button
-              className="mt-4 text-sm flex items-center gap-2"
-              style={{ color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}
-              onClick={() => setAdvanced(!advanced)}
-            >
-              <span>{advanced ? "▲" : "▼"}</span> Advanced Options
-            </button>
+                {/* Streak Options */}
+                {cardType === "streak" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup label="GitHub Username *" description="User whose streak to show">
+                      <input
+                        type="text"
+                        placeholder="e.g., octocat"
+                        value={streakUsername}
+                        onChange={(e) => setStreakUsername(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+                    <FormGroup label="Custom Title" description="Card title override">
+                      <input
+                        type="text"
+                        placeholder="e.g., Activity Streak"
+                        value={streakTitle}
+                        onChange={(e) => setStreakTitle(e.target.value)}
+                      />
+                    </FormGroup>
+                  </div>
+                )}
 
-            {advanced && (
-              <div className="mt-4 pt-4 space-y-4" style={{ borderTop: "1px solid var(--border)" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                  <FormGroup label="Border Radius">
-                    <input className="input-field" type="number" value={borderRadius} min="0" max="30" step="0.5" onChange={(e) => setBorderRadius(e.target.value)} />
-                  </FormGroup>
-                  <FormGroup label="Card Width">
-                    <input className="input-field" type="number" placeholder="e.g., 500" value={cardWidth} onChange={(e) => setCardWidth(e.target.value)} />
-                  </FormGroup>
-                  <FormGroup label="Cache (seconds)">
-                    <input className="input-field" type="number" placeholder="e.g., 86400" value={cacheSeconds} onChange={(e) => setCacheSeconds(e.target.value)} />
-                  </FormGroup>
-                  <FormGroup label="Locale">
-                    <input className="input-field" placeholder="e.g., en, cn, de" value={locale} onChange={(e) => setLocale(e.target.value)} />
-                  </FormGroup>
-                </div>
-                <div className="flex flex-wrap gap-4">
-                  {[
-                    { label: "Hide Border", val: hideBorder, set: setHideBorder },
-                    { label: "Hide Title", val: hideTitle, set: setHideTitle },
-                    { label: "Disable Animations", val: disableAnimations, set: setDisableAnimations },
-                  ].map(({ label, val, set }) => (
-                    <label key={label} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input type="checkbox" checked={val} onChange={(e) => set(e.target.checked)} />
-                      {label}
+                {/* Gist Options */}
+                {cardType === "gist" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup label="Gist ID *" description="The Gist identifier">
+                      <input
+                        type="text"
+                        placeholder="e.g., bbfce31e0217a3689c8d961a356cb10d"
+                        value={gistId}
+                        onChange={(e) => setGistId(e.target.value)}
+                        className="font-mono text-sm"
+                      />
+                    </FormGroup>
+                    <label className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={gistShowOwner}
+                        onChange={(e) => setGistShowOwner(e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-text-secondary">Show gist owner</span>
                     </label>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {/* Wakatime Options */}
+                {cardType === "wakatime" && (
+                  <div className="space-y-5 animate-fade-in-up animate-delay-200">
+                    <FormGroup label="Wakatime Username *" description="Your Wakatime username">
+                      <input
+                        type="text"
+                        placeholder="e.g., octocat"
+                        value={wakaUsername}
+                        onChange={(e) => setWakaUsername(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+                    <FormGroup label="Custom Title" description="Card title override">
+                      <input
+                        type="text"
+                        placeholder="e.g., WakaTime Stats"
+                        value={wakaTitle}
+                        onChange={(e) => setWakaTitle(e.target.value)}
+                      />
+                    </FormGroup>
+                    <FormGroup label="Layout" description="Visual arrangement">
+                      <select value={wakaLayout} onChange={(e) => setWakaLayout(e.target.value)}>
+                        <option value="normal">Normal</option>
+                        <option value="compact">Compact</option>
+                      </select>
+                    </FormGroup>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </section>
 
-        {/* Preview Panel */}
-        <div style={{ position: "sticky", top: "2rem", alignSelf: "start" }}>
-          <div
-            className="rounded-lg p-6"
-            style={{ background: "var(--card-bg)", border: "1px solid var(--border)" }}
-          >
-            <h2 className="text-xl font-semibold mb-4" style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem" }}>
-              Live Preview
-            </h2>
-
-            {/* Preview Frame */}
-            <div
-              className="rounded-lg flex items-center justify-center mb-4 overflow-hidden"
-              style={{
-                background: "#fafbfc",
-                border: "1px solid var(--border)",
-                minHeight: 200,
-                padding: "1rem",
-              }}
+            {/* Appearance Panel */}
+            <section
+              className="glass-card animate-fade-in-up animate-delay-300"
+              style={{ marginTop: "3rem", marginBottom: "3rem", padding: "2rem" }}
             >
-              {valid && url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={url}
-                  alt="Card Preview"
-                  className="max-w-full h-auto rounded"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                    (e.target as HTMLImageElement).parentElement!.innerHTML =
-                      '<span style="color:var(--text-muted);font-style:italic">Error loading preview. Check your username.</span>';
-                  }}
-                />
-              ) : (
-                <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
-                  Configure your card to see the preview
-                </span>
-              )}
-            </div>
-
-            {/* Generated URL */}
-            <label className="block text-sm font-semibold mb-2">Generated URL</label>
-            <div
-              className="rounded-lg p-3 mb-3 text-sm font-mono break-all"
-              style={{
-                background: "#f6f8fa",
-                border: "1px solid var(--border)",
-                maxHeight: 100,
-                overflowY: "auto",
-                fontSize: "0.8rem",
-                lineHeight: 1.5,
-                color: valid ? "var(--text)" : "var(--text-muted)",
-              }}
-            >
-              {url || "Enter a username to generate URL"}
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={copyUrl}
-                disabled={!valid}
-                className="px-4 py-2 rounded-md text-sm font-semibold"
-                style={{
-                  background: valid ? "var(--primary)" : "#ccc",
-                  color: "white",
-                  border: "none",
-                  cursor: valid ? "pointer" : "not-allowed",
-                  transition: "background 0.2s",
-                }}
+              <h2
+                className="text-xl font-semibold mb-8 flex items-center gap-2 mt-4"
+                style={{ marginBottom: "2rem" }}
               >
-                {copied ? "✓ Copied!" : "Copy URL"}
-              </button>
-              {valid && url && (
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-md text-sm font-semibold"
-                  style={{
-                    background: "var(--card-bg)",
-                    color: "var(--text)",
-                    border: "1px solid var(--border)",
-                    textDecoration: "none",
-                  }}
-                >
-                  Open ↗
-                </a>
-              )}
-            </div>
+                <span className="w-1 h-6 bg-gradient-to-b from-accent to-primary rounded-full" />
+                Appearance
+              </h2>
 
-            {/* Markdown snippet */}
-            {valid && url && (
-              <div className="mt-4">
-                <label className="block text-sm font-semibold mb-2">Markdown Snippet</label>
-                <pre
-                  className="rounded-lg p-3 text-sm overflow-auto"
-                  style={{
-                    background: "#f6f8fa",
-                    border: "1px solid var(--border)",
-                    fontSize: "0.75rem",
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-all",
-                  }}
-                >{`![Card](${url})`}</pre>
+              <div className="space-y-6">
+                <FormGroup label="Theme" description="Choose a preset theme or customize colors">
+                  <select
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    className="font-mono"
+                  >
+                    <option value="">Custom Colors</option>
+                    {THEMES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </FormGroup>
+
+                {!theme && (
+                  <div className="space-y-4 pt-2">
+                    {(
+                      Object.entries({
+                        titleColor: "Title Color",
+                        iconColor: "Icon Color",
+                        textColor: "Text Color",
+                        bgColor: "Background",
+                        borderColor: "Border Color",
+                      }) as [keyof ColorConfig, string][]
+                    ).map(([key, label], idx) => (
+                      <div
+                        key={key}
+                        className="grid grid-cols-[100px_1fr] sm:grid-cols-[120px_1fr] gap-4 items-center p-3 rounded-lg bg-bg-tertiary/50 border border-card-border/50 hover:border-primary/30 transition-all"
+                        style={{ animationDelay: `${400 + idx * 100}ms` }}
+                      >
+                        <span className="text-sm font-medium text-text-secondary">{label}</span>
+                        <div className="flex gap-3 items-center">
+                          <input
+                            type="color"
+                            value={colors[key]}
+                            onChange={(e) => setColors({ ...colors, [key]: e.target.value })}
+                            className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
+                          />
+                          <input
+                            type="text"
+                            value={colors[key]}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setColors({ ...colors, [key]: v });
+                            }}
+                            className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Advanced Toggle */}
+                <button
+                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors group"
+                  style={{ marginTop: "2rem", marginBottom: "1rem" }}
+                  onClick={() => setAdvanced(!advanced)}
+                >
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-300 ${advanced ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                  Advanced Options
+                </button>
+
+                {advanced && (
+                  <div className="space-y-5 pt-4 mt-4 border-t border-card-border animate-fade-in-up">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <FormGroup label="Border Radius" description="Corner rounding (0-30)">
+                        <input
+                          type="number"
+                          value={borderRadius}
+                          min="0"
+                          max="30"
+                          step="0.5"
+                          onChange={(e) => setBorderRadius(e.target.value)}
+                          className="font-mono"
+                        />
+                      </FormGroup>
+                      <FormGroup label="Card Width" description="Fixed width in pixels">
+                        <input
+                          type="number"
+                          placeholder="e.g., 500"
+                          value={cardWidth}
+                          onChange={(e) => setCardWidth(e.target.value)}
+                          className="font-mono"
+                        />
+                      </FormGroup>
+                      <FormGroup label="Cache (seconds)" description="Cache duration">
+                        <input
+                          type="number"
+                          placeholder="e.g., 86400"
+                          value={cacheSeconds}
+                          onChange={(e) => setCacheSeconds(e.target.value)}
+                          className="font-mono"
+                        />
+                      </FormGroup>
+                      <FormGroup label="Locale" description="Language code">
+                        <input
+                          type="text"
+                          placeholder="e.g., en, cn, de"
+                          value={locale}
+                          onChange={(e) => setLocale(e.target.value)}
+                          className="font-mono"
+                        />
+                      </FormGroup>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {[
+                        { label: "Hide Border", val: hideBorder, set: setHideBorder },
+                        { label: "Hide Title", val: hideTitle, set: setHideTitle },
+                        {
+                          label: "Disable Animations",
+                          val: disableAnimations,
+                          set: setDisableAnimations,
+                        },
+                      ].map(({ label, val, set }) => (
+                        <label
+                          key={label}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={val}
+                            onChange={(e) => set(e.target.checked)}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm text-text-secondary">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </section>
+          </div>
+
+          {/* Preview Panel */}
+          <div>
+            <div className="sticky top-8 space-y-8">
+              <section
+                className="glass-card animate-fade-in-up animate-delay-400"
+                style={{ marginTop: "3rem", padding: "2rem" }}
+              >
+                <h2
+                  className="text-xl font-semibold mb-6 flex items-center gap-2"
+                  style={{ marginBottom: "2rem" }}
+                >
+                  <span className="w-1 h-6 bg-gradient-to-b from-success to-accent rounded-full" />
+                  Live Preview
+                </h2>
+
+                {/* Preview Frame */}
+                <div className="relative rounded-xl overflow-hidden mb-6 bg-bg-secondary border border-card-border shadow-lg">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 pointer-events-none" />
+                  <div className="relative flex items-center justify-center min-h-[280px] p-4">
+                    {mounted && valid && url ? (
+                      <img
+                        src={url}
+                        alt="Card Preview"
+                        className="max-w-full h-auto rounded-lg shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
+                        style={{
+                          padding: "1rem",
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).parentElement!.innerHTML =
+                            '<div class="text-center p-8"><div class="text-4xl mb-3">⚠️</div><p class="text-text-muted text-sm">Error loading preview. Check your configuration.</p></div>';
+                        }}
+                      />
+                    ) : (
+                      <div className="text-center p-8">
+                        <div className="text-5xl mb-4 opacity-30">🎨</div>
+                        <p className="text-text-muted text-sm">
+                          {mounted ? "Configure your card to see the preview" : "Loading..."}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Generated URL */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-text">Generated URL</label>
+                  <div
+                    className="rounded-xl p-4 text-sm font-mono bg-bg-secondary border border-card-border shadow-inner overflow-x-auto"
+                    style={{
+                      fontSize: "0.8125rem",
+                      lineHeight: "1.6",
+                      color: valid ? "var(--color-text)" : "var(--color-text-muted)",
+                    }}
+                  >
+                    {url || "Enter a username to generate URL"}
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button
+                      onClick={copyUrl}
+                      disabled={!valid}
+                      className={`
+                        flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300
+                        flex items-center justify-center gap-2
+                        ${
+                          valid
+                            ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]"
+                            : "bg-bg-tertiary text-text-muted cursor-not-allowed"
+                        }
+                      `}
+                    >
+                      {copied ? (
+                        <>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Copy URL
+                        </>
+                      )}
+                    </button>
+                    {valid && url && (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-center transition-all duration-300
+                          bg-bg-tertiary border border-card-border text-text hover:border-primary/50 hover:bg-bg-secondary
+                          flex items-center justify-center gap-2 group"
+                      >
+                        <span>Open Card</span>
+                        <svg
+                          className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Markdown snippet */}
+                {valid && url && (
+                  <div className="mt-6 animate-fade-in-up">
+                    <label className="block text-sm font-semibold mb-3 text-text">
+                      Markdown Snippet
+                    </label>
+                    <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner">
+                      <code className="text-text-secondary font-mono">
+                        {`![GitHub Stats](${url})`}
+                      </code>
+                    </pre>
+                  </div>
+                )}
+              </section>
+
+              {/* Info Card */}
+              <section
+                className="glass-card p-6animate-fade-in-up animate-delay-500"
+                style={{ marginTop: "3rem", padding: "2rem" }}
+              >
+                <h3
+                  className="text-lg font-semibold mb-3 text-text"
+                  style={{ marginBottom: "1rem", padding: "1rem" }}
+                >
+                  Quick Tips
+                </h3>
+                <ul className="space-y-2 text-sm text-text-secondary">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>
+                      Use a <strong className="text-text">GitHub Personal Access Token</strong> for
+                      higher rate limits
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent mt-0.5">•</span>
+                    <span>Custom colors override theme selections</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-success mt-0.5">•</span>
+                    <span>Cards are cached by default for 24 hours</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>All parameters are optional except required fields</span>
+                  </li>
+                </ul>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      <style>{`
-        .input-field {
-          width: 100%;
-          padding: 0.5rem 0.75rem;
-          font-size: 0.875rem;
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          background: var(--card-bg);
-          color: var(--text);
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .input-field:focus {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.1);
-        }
-        select.input-field {
-          cursor: pointer;
-        }
-        .space-y-4 > * + * { margin-top: 1rem; }
-        .space-y-3 > * + * { margin-top: 0.75rem; }
-        .space-y-2 > * + * { margin-top: 0.5rem; }
-        @media (max-width: 768px) {
-          .max-w-7xl { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      {/* Footer */}
+      <footer className="text-center py-8 px-4 border-t border-card-border mt-12">
+        <p className="text-sm text-text-muted">Built with Next.js 15 • Open source on GitHub</p>
+      </footer>
     </div>
   );
 }
 
-function FormGroup({ label, children }: { label: string; children: React.ReactNode }) {
+function FormGroup({
+  label,
+  children,
+  description,
+}: {
+  label: string;
+  children: React.ReactNode;
+  description?: string;
+}) {
   return (
     <div>
-      <label className="block text-sm font-semibold mb-1.5">{label}</label>
+      <label className="block text-sm font-semibold mb-2 text-text flex items-center gap-2">
+        {label}
+      </label>
+      {description && <p className="text-xs text-text-muted mb-2">{description}</p>}
       {children}
     </div>
   );
