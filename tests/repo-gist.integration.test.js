@@ -33,7 +33,6 @@ describe("Integration: Repo and Gist Cards Flow", () => {
         forkCount: 25,
       };
 
-      // @ts-ignore - mock
       fetchRepo.mockResolvedValue(mockRepoData);
 
       const data = await fetchRepo("testuser", "testrepo");
@@ -89,7 +88,6 @@ describe("Integration: Repo and Gist Cards Flow", () => {
         forksCount: 5,
       };
 
-      // @ts-ignore - mock
       fetchGist.mockResolvedValue(mockGistData);
 
       const data = await fetchGist("testuser", "gistid");

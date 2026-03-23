@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach } from "@jest/globals";
+import { describe, expect, it, beforeEach } from "@jest/globals";
 import { guardAccess } from "../src/common/access.js";
 
 const colors = { title_color: "fff", text_color: "fff", bg_color: "000", border_color: "000" };

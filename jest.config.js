@@ -1,4 +1,4 @@
-export default {
+const jestConfig = {
   clearMocks: true,
   testEnvironment: "jsdom",
   coverageProvider: "v8",
@@ -25,3 +25,5 @@ export default {
   // Don't transform node_modules
   transformIgnorePatterns: ["/node_modules/"],
 };
+
+export default jestConfig;

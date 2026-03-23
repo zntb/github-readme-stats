@@ -1,23 +1,31 @@
 import { describe, expect, it } from "@jest/globals";
-import { getByTestId, queryAllByTestId, queryByTestId } from "@testing-library/dom";
+import { getByTestId, queryByTestId } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 import { cssToObject } from "@uppercod/css-to-object";
 import { renderStatsCard } from "../src/cards/stats.js";
 import { CustomError } from "../src/common/error.js";
-import { themes } from "../themes/index.js";
 
 const stats = {
   name: "Anurag Hazra",
-  totalStars: 100, totalCommits: 200, totalIssues: 300, totalPRs: 400,
-  totalPRsMerged: 320, mergedPRsPercentage: 80, totalReviews: 50,
-  totalDiscussionsStarted: 10, totalDiscussionsAnswered: 50,
-  contributedTo: 500, rank: { level: "A+", percentile: 40 },
+  totalStars: 100,
+  totalCommits: 200,
+  totalIssues: 300,
+  totalPRs: 400,
+  totalPRsMerged: 320,
+  mergedPRsPercentage: 80,
+  totalReviews: 50,
+  totalDiscussionsStarted: 10,
+  totalDiscussionsAnswered: 50,
+  contributedTo: 500,
+  rank: { level: "A+", percentile: 40 },
 };
 
 describe("Test renderStatsCard", () => {
   it("should render correctly", () => {
     document.body.innerHTML = renderStatsCard(stats);
-    expect(document.getElementsByClassName("header")[0].textContent).toBe("Anurag Hazra's GitHub Stats");
+    expect(document.getElementsByClassName("header")[0].textContent).toBe(
+      "Anurag Hazra's GitHub Stats",
+    );
     expect(document.body.getElementsByTagName("svg")[0].getAttribute("height")).toBe("195");
     expect(getByTestId(document.body, "stars").textContent).toBe("100");
     expect(getByTestId(document.body, "commits").textContent).toBe("200");
@@ -49,7 +57,13 @@ describe("Test renderStatsCard", () => {
 
   it("should show additional stats", () => {
     document.body.innerHTML = renderStatsCard(stats, {
-      show: ["reviews", "discussions_started", "discussions_answered", "prs_merged", "prs_merged_percentage"],
+      show: [
+        "reviews",
+        "discussions_started",
+        "discussions_answered",
+        "prs_merged",
+        "prs_merged_percentage",
+      ],
     });
     expect(queryByTestId(document.body, "reviews")).toBeDefined();
     expect(queryByTestId(document.body, "prs_merged")).toBeDefined();
@@ -79,7 +93,12 @@ describe("Test renderStatsCard", () => {
   });
 
   it("should render custom colors properly", () => {
-    const customColors = { title_color: "5a0", icon_color: "1b998b", text_color: "9991", bg_color: "252525" };
+    const customColors = {
+      title_color: "5a0",
+      icon_color: "1b998b",
+      text_color: "9991",
+      bg_color: "252525",
+    };
     document.body.innerHTML = renderStatsCard(stats, { ...customColors });
     const stylesObject = cssToObject(document.querySelector("style").innerHTML);
     expect(stylesObject[":host"][".header "].fill.trim()).toBe(`#${customColors.title_color}`);
@@ -108,6 +127,8 @@ describe("Test renderStatsCard", () => {
         hide: ["stars", "commits", "prs", "issues", "contribs"],
         hide_rank: true,
       }),
-    ).toThrow(new CustomError("Could not render stats card.", "Either stats or rank are required."));
+    ).toThrow(
+      new CustomError("Could not render stats card.", "Either stats or rank are required."),
+    );
   });
 });

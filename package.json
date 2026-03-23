@@ -2,12 +2,14 @@
   "name": "github-readme-stats",
   "version": "1.0.0",
   "description": "Dynamically generate stats for your GitHub readme",
+  "author": "zntb (forked from Anurag Hazra)",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint",
     "test": "node node_modules/jest/bin/jest.js --coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
     "type-check": "tsc --noEmit",
@@ -46,6 +48,10 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  },
+
   "engines": {
     "node": ">=22"
   }

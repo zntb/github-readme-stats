@@ -15,7 +15,6 @@ jest.mock("../src/fetchers/top-languages.js", () => ({
 }));
 
 import { fetchStats } from "../src/fetchers/stats.js";
-import { renderStatsCard } from "../src/cards/stats.js";
 import { getCardColors } from "../src/common/color.js";
 import { calculateRank } from "../src/calculateRank.js";
 
@@ -40,7 +39,6 @@ describe("Integration: Stats Card Flow", () => {
       rank: { level: "A", percentile: 15 },
     };
 
-    // @ts-ignore - mock
     fetchStats.mockResolvedValue(mockStatsData);
 
     const data = await fetchStats("testuser", {});
@@ -66,6 +64,7 @@ describe("Integration: Stats Card Flow", () => {
   });
 
   it("should render card with custom colors", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const stats = {
       name: "Test User",
       totalStars: 100,

@@ -10,7 +10,6 @@ jest.mock("axios", () => ({
 }));
 
 import { retryer, RETRIES } from "../src/common/retryer.js";
-import { CustomError } from "../src/common/error.js";
 
 describe("Test retryer.js", () => {
   beforeEach(() => {

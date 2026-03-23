@@ -32,7 +32,6 @@ describe("Integration: Top Languages Card Flow", () => {
       CSS: { name: "CSS", color: "#563d7c", size: 200 },
     };
 
-    // @ts-ignore - mock
     fetchTopLanguages.mockResolvedValue(mockLanguages);
 
     const data = await fetchTopLanguages("testuser", {});
@@ -98,6 +97,7 @@ describe("Integration: Top Languages Card Flow", () => {
 
 describe("Integration: Multi-Card Color Theme", () => {
   it("should apply consistent theme across multiple cards", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const themeName = "dark";
     const colors = {
       title_color: "ffffff",
