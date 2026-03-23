@@ -85,7 +85,6 @@ export default function URLBuilder() {
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Card-specific state
   const [statsUsername, setStatsUsername] = useState("");
   const [statsTitle, setStatsTitle] = useState("");
   const [statsHide, setStatsHide] = useState("");
@@ -111,7 +110,6 @@ export default function URLBuilder() {
   const [wakaTitle, setWakaTitle] = useState("");
   const [wakaLayout, setWakaLayout] = useState("normal");
 
-  // Advanced options
   const [borderRadius, setBorderRadius] = useState("4.5");
   const [cardWidth, setCardWidth] = useState("");
   const [cacheSeconds, setCacheSeconds] = useState("");
@@ -274,21 +272,14 @@ export default function URLBuilder() {
       <main className="container-centered pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Configuration Panel */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Card Type Tabs */}
-            <section
-              className="glass-card animate-fade-in-up animate-delay-100"
-              style={{ marginTop: "3rem", marginBottom: "3rem", padding: "2rem" }}
-            >
-              <h2
-                className="text-xl font-semibold flex items-center gap-2"
-                style={{ marginBottom: "2rem" }}
-              >
+            <section className="glass-card animate-fade-in-up animate-delay-100">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full" />
                 Card Type
               </h2>
 
-              {/* Tab buttons - responsive grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
                 {tabs.map((tab) => (
                   <button
@@ -313,9 +304,7 @@ export default function URLBuilder() {
                 ))}
               </div>
 
-              {/* Card-specific options */}
               <div className="space-y-6">
-                {/* Stats Options */}
                 {cardType === "stats" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="Enter your GitHub username">
@@ -380,7 +369,6 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Pin Options */}
                 {cardType === "pin" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="Repository owner">
@@ -421,7 +409,6 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Top Languages Options */}
                 {cardType === "top-langs" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup
@@ -471,7 +458,6 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Streak Options */}
                 {cardType === "streak" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="User whose streak to show">
@@ -494,7 +480,6 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Gist Options */}
                 {cardType === "gist" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="Gist ID *" description="The Gist identifier">
@@ -518,7 +503,6 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Wakatime Options */}
                 {cardType === "wakatime" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="Wakatime Username *" description="Your Wakatime username">
@@ -550,14 +534,8 @@ export default function URLBuilder() {
             </section>
 
             {/* Appearance Panel */}
-            <section
-              className="glass-card animate-fade-in-up animate-delay-300"
-              style={{ marginTop: "3rem", marginBottom: "3rem", padding: "2rem" }}
-            >
-              <h2
-                className="text-xl font-semibold mb-8 flex items-center gap-2 mt-4"
-                style={{ marginBottom: "2rem" }}
-              >
+            <section className="glass-card animate-fade-in-up animate-delay-300">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-accent to-primary rounded-full" />
                 Appearance
               </h2>
@@ -617,10 +595,8 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                {/* Advanced Toggle */}
                 <button
-                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors group"
-                  style={{ marginTop: "2rem", marginBottom: "1rem" }}
+                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors group mt-4"
                   onClick={() => setAdvanced(!advanced)}
                 >
                   <svg
@@ -640,7 +616,7 @@ export default function URLBuilder() {
                 </button>
 
                 {advanced && (
-                  <div className="space-y-5 pt-4 mt-4 border-t border-card-border animate-fade-in-up">
+                  <div className="space-y-5 pt-4 border-t border-card-border animate-fade-in-up">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <FormGroup label="Border Radius" description="Corner rounding (0-30)">
                         <input
@@ -713,31 +689,21 @@ export default function URLBuilder() {
 
           {/* Preview Panel */}
           <div>
-            <div className="sticky top-8 space-y-8">
-              <section
-                className="glass-card animate-fade-in-up animate-delay-400"
-                style={{ marginTop: "3rem", padding: "2rem" }}
-              >
-                <h2
-                  className="text-xl font-semibold mb-6 flex items-center gap-2"
-                  style={{ marginBottom: "2rem" }}
-                >
+            <div className="sticky top-8 space-y-6">
+              <section className="glass-card animate-fade-in-up animate-delay-400">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-success to-accent rounded-full" />
                   Live Preview
                 </h2>
 
-                {/* Preview Frame */}
                 <div className="relative rounded-xl overflow-hidden mb-6 bg-bg-secondary border border-card-border shadow-lg">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 pointer-events-none" />
-                  <div className="relative flex items-center justify-center min-h-[280px] p-4">
+                  <div className="relative flex items-center justify-center min-h-[280px] p-6">
                     {mounted && valid && url ? (
                       <img
                         src={url}
                         alt="Card Preview"
                         className="max-w-full h-auto rounded-lg shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
-                        style={{
-                          padding: "1rem",
-                        }}
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = "none";
                           (e.target as HTMLImageElement).parentElement!.innerHTML =
@@ -755,34 +721,19 @@ export default function URLBuilder() {
                   </div>
                 </div>
 
-                {/* Generated URL */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-text">Generated URL</label>
-                  <div
-                    className="rounded-xl p-4 text-sm font-mono bg-bg-secondary border border-card-border shadow-inner overflow-x-auto"
-                    style={{
-                      fontSize: "0.8125rem",
-                      lineHeight: "1.6",
-                      color: valid ? "var(--color-text)" : "var(--color-text-muted)",
-                    }}
-                  >
-                    {url || "Enter a username to generate URL"}
+                  <div className="rounded-xl p-4 text-sm font-mono bg-bg-secondary border border-card-border shadow-inner overflow-x-auto leading-relaxed">
+                    <span className={valid ? "text-text" : "text-text-muted"}>
+                      {url || "Enter a username to generate URL"}
+                    </span>
                   </div>
 
-                  {/* Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <button
                       onClick={copyUrl}
                       disabled={!valid}
-                      className={`
-                        flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300
-                        flex items-center justify-center gap-2
-                        ${
-                          valid
-                            ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]"
-                            : "bg-bg-tertiary text-text-muted cursor-not-allowed"
-                        }
-                      `}
+                      className={`flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${valid ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]" : "bg-bg-tertiary text-text-muted cursor-not-allowed"}`}
                     >
                       {copied ? (
                         <>
@@ -825,9 +776,7 @@ export default function URLBuilder() {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-center transition-all duration-300
-                          bg-bg-tertiary border border-card-border text-text hover:border-primary/50 hover:bg-bg-secondary
-                          flex items-center justify-center gap-2 group"
+                        className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-center transition-all duration-300 bg-bg-tertiary border border-card-border text-text hover:border-primary/50 hover:bg-bg-secondary flex items-center justify-center gap-2 group"
                       >
                         <span>Open Card</span>
                         <svg
@@ -848,33 +797,22 @@ export default function URLBuilder() {
                   </div>
                 </div>
 
-                {/* Markdown snippet */}
                 {valid && url && (
                   <div className="mt-6 animate-fade-in-up">
                     <label className="block text-sm font-semibold mb-3 text-text">
                       Markdown Snippet
                     </label>
                     <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner">
-                      <code className="text-text-secondary font-mono">
-                        {`![GitHub Stats](${url})`}
-                      </code>
+                      <code className="text-text-secondary font-mono">{`![GitHub Stats](${url})`}</code>
                     </pre>
                   </div>
                 )}
               </section>
 
               {/* Info Card */}
-              <section
-                className="glass-card p-6animate-fade-in-up animate-delay-500"
-                style={{ marginTop: "3rem", padding: "2rem" }}
-              >
-                <h3
-                  className="text-lg font-semibold mb-3 text-text"
-                  style={{ marginBottom: "1rem", padding: "1rem" }}
-                >
-                  Quick Tips
-                </h3>
-                <ul className="space-y-2 text-sm text-text-secondary">
+              <section className="glass-card animate-fade-in-up animate-delay-500">
+                <h3 className="text-lg font-semibold mb-4 text-text">Quick Tips</h3>
+                <ul className="space-y-3 text-sm text-text-secondary">
                   <li className="flex items-start gap-2">
                     <span className="text-primary mt-0.5">•</span>
                     <span>
@@ -901,7 +839,6 @@ export default function URLBuilder() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="text-center py-8 px-4 border-t border-card-border mt-12">
         <p className="text-sm text-text-muted">Built with Next.js 15 • Open source on GitHub</p>
       </footer>
@@ -919,12 +856,10 @@ function FormGroup({
   description?: string;
 }) {
   return (
-    <div>
-      <label className="block text-sm font-semibold mb-2 text-text flex items-center gap-2">
-        {label}
-      </label>
-      {description && <p className="text-xs text-text-muted mb-2">{description}</p>}
-      {children}
+    <div className="space-y-1.5">
+      <label className="text-sm font-semibold text-text flex items-center gap-2">{label}</label>
+      {description && <p className="text-xs text-text-muted">{description}</p>}
+      <div className="pt-1">{children}</div>
     </div>
   );
 }
