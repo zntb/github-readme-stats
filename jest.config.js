@@ -1,6 +1,5 @@
 export default {
   clearMocks: true,
-  transform: {},
   testEnvironment: "jsdom",
   coverageProvider: "v8",
   testMatch: ["<rootDir>/tests/**/*.test.js"],
@@ -19,6 +18,10 @@ export default {
     // Allow @/ imports in tests (matches tsconfig paths)
     "^@/(.*)$": "<rootDir>/$1",
   },
-  // Needed so Jest can import ESM modules without transformation
-  extensionsToTreatAsEsm: [],
+  // Transform all JS files with babel
+  transform: {
+    "^.+\\.js$": "babel-jest",
+  },
+  // Don't transform node_modules
+  transformIgnorePatterns: ["/node_modules/"],
 };

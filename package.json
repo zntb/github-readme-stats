@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test": "node node_modules/jest/bin/jest.js --coverage",
+    "test:watch": "node node_modules/jest/bin/jest.js --watch",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@actions/core": "^2.0.3",
     "@actions/github": "^6.0.1",
+    "@babel/preset-env": "^7.29.2",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.2",
     "@tailwindcss/postcss": "^4.1.8",

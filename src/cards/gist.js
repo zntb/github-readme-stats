@@ -6,9 +6,7 @@ import { kFormatter, wrapTextMultiline } from "../common/fmt.js";
 import { encodeHTML } from "../common/html.js";
 import { icons } from "../common/icons.js";
 import { parseEmojis } from "../common/ops.js";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const languageColors = require("../common/languageColors.json");
+import languageColors from "../common/languageColors.json";
 
 const ICON_SIZE = 16;
 const CARD_DEFAULT_WIDTH = 400;
