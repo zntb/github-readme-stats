@@ -2,22 +2,11 @@
 import { Card } from "../common/Card.js";
 import { getCardColors } from "../common/color.js";
 import { kFormatter } from "../common/fmt.js";
-import { flexLayout } from "../common/render.js";
 import { icons } from "../common/icons.js";
 
 const CARD_MIN_WIDTH = 300;
-const CARD_DEFAULT_WIDTH = 350;
+const CARD_DEFAULT_WIDTH = 400;
 const CARD_MAX_WIDTH = 600;
-
-const createStatItem = (icon, value, testid) => {
-  const iconSvg = `
-    <svg class="icon" y="-12" viewBox="0 0 16 16" version="1.1" width="16" height="16">
-      ${icon}
-    </svg>
-  `;
-  const text = `<text data-testid="${testid}" class="stat">${value}</text>`;
-  return flexLayout({ items: [iconSvg, text], gap: 10, direction: "row" }).join("");
-};
 
 const renderStreakCard = (streakData, options = {}) => {
   const { currentStreak, longestStreak, totalContributingDays } = streakData;
@@ -56,9 +45,16 @@ const renderStreakCard = (streakData, options = {}) => {
           : card_width
     : CARD_DEFAULT_WIDTH;
 
+  // Explicit x position for each of the three columns
+  const padX = 25;
+  const innerWidth = width - padX * 2;
+  const col0 = padX;
+  const col1 = padX + Math.floor(innerWidth / 3);
+  const col2 = padX + Math.floor((innerWidth * 2) / 3);
+
   const card = new Card({
     width,
-    height: 150,
+    height: 160,
     border_radius,
     customTitle: custom_title,
     defaultTitle: "Activity Streak",
@@ -73,25 +69,36 @@ const renderStreakCard = (streakData, options = {}) => {
     desc: `Current streak: ${currentStreak} days, Longest streak: ${longestStreak} days, Total contributing days: ${totalContributingDays}`,
   });
 
-  const statItems = [
-    createStatItem(icons.commits, kFormatter(currentStreak), "currentStreak"),
-    createStatItem(icons.star, kFormatter(longestStreak), "longestStreak"),
-    createStatItem(icons.contribs, kFormatter(totalContributingDays), "totalContributingDays"),
-  ];
-
-  const body = flexLayout({ items: statItems, gap: 15, direction: "row" }).join("");
-
   card.setCSS(`
-    .stat { font: 800 15px "Segoe UI", Ubuntu, "Helvetica Neue", Sans-Serif, sans-serif; fill: ${textColor}; }
-    .stat-bold { font: 800 20px "Segoe UI", Ubuntu, "Helvetica Neue", Sans-Serif, sans-serif; }
-    .icon { fill: ${iconColor}; }
-    @keyframes group_animation {
-      transform: translateY(0); 0% { transform: translateY(0); } 100% { transform: translateY(0); }
+    .stat-label {
+      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${textColor};
+      opacity: 0.8;
     }
-    .group { animation: group_animation 0.5s ease-out; }
+    .stat-value {
+      font: 800 20px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${textColor};
+    }
+    .icon { fill: ${iconColor}; }
   `);
 
-  return card.render(`<g class="group">${body}</g>`);
+  // Each stat column uses a hard-coded x coordinate — no flexLayout, no overlap risk.
+  // The Card body g already sits at translate(0, 55), so y=0 here is just below the title.
+  const body = `
+    <svg x="${col0}" y="0" width="16" height="16" viewBox="0 0 16 16" class="icon">${icons.commits}</svg>
+    <text x="${col0}" y="28" class="stat-label">Current Streak</text>
+    <text x="${col0}" y="52" class="stat-value" data-testid="currentStreak">${kFormatter(currentStreak)}</text>
+
+    <svg x="${col1}" y="0" width="16" height="16" viewBox="0 0 16 16" class="icon">${icons.star}</svg>
+    <text x="${col1}" y="28" class="stat-label">Longest Streak</text>
+    <text x="${col1}" y="52" class="stat-value" data-testid="longestStreak">${kFormatter(longestStreak)}</text>
+
+    <svg x="${col2}" y="0" width="16" height="16" viewBox="0 0 16 16" class="icon">${icons.contribs}</svg>
+    <text x="${col2}" y="28" class="stat-label">Total Days</text>
+    <text x="${col2}" y="52" class="stat-value" data-testid="totalContributingDays">${kFormatter(totalContributingDays)}</text>
+  `;
+
+  return card.render(body);
 };
 
 export { renderStreakCard, CARD_MIN_WIDTH, CARD_DEFAULT_WIDTH };
