@@ -96,6 +96,7 @@ export default function URLBuilder() {
   });
   const [advanced, setAdvanced] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [markdownCopied, setMarkdownCopied] = useState(false);
   const [mounted] = useState(true); // Always true on client - no hydration issue for this use case
 
   const [statsUsername, setStatsUsername] = useState("");
@@ -301,6 +302,15 @@ export default function URLBuilder() {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const copyMarkdown = async () => {
+    if (valid && url) {
+      const markdown = `![GitHub Stats](${url})`;
+      await navigator.clipboard.writeText(markdown);
+      setMarkdownCopied(true);
+      setTimeout(() => setMarkdownCopied(false), 2000);
     }
   };
 
@@ -999,9 +1009,29 @@ export default function URLBuilder() {
 
                 {valid && url && (
                   <div className="mt-6 animate-fade-in-up">
-                    <label className="block text-sm font-semibold mb-3 text-text">
-                      Markdown Snippet
-                    </label>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-sm font-semibold text-text">Markdown Snippet</label>
+                      <button
+                        onClick={copyMarkdown}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary border border-card-border text-text-secondary hover:text-text hover:border-primary/50 transition-all"
+                      >
+                        {markdownCopied ? (
+                          <>
+                            <svg className="w-3.5 h-3.5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-success">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                     <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner">
                       <code className="text-text-secondary font-mono">{`![GitHub Stats](${url})`}</code>
                     </pre>
