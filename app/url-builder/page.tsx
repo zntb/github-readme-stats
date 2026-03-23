@@ -698,6 +698,7 @@ export default function URLBuilder() {
                   <div className="relative flex items-center justify-center min-h-[280px] p-6">
                     {mounted && valid && url ? (
                       <img
+                        key={url}
                         src={url}
                         alt="Card Preview"
                         className="max-w-full h-auto rounded-lg shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
