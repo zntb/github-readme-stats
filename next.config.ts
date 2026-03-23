@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
     return config;
   },
 
+  // Turbopack configuration (required in Next.js 16+ when using webpack config)
+  turbopack: {},
+
   // Redirect / → /url-builder
   async redirects() {
     return [
