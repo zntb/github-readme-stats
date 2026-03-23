@@ -1,6 +1,12 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  parseBoolean, parseArray, clampValue, lowercaseTrim, chunkArray, parseEmojis, dateDiff,
+  parseBoolean,
+  parseArray,
+  clampValue,
+  lowercaseTrim,
+  chunkArray,
+  parseEmojis,
+  dateDiff,
 } from "../src/common/ops.js";
 
 describe("Test ops.js", () => {

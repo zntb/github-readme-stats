@@ -5,25 +5,61 @@ import { calculateRank } from "../src/calculateRank.js";
 describe("Test calculateRank", () => {
   it("new user gets C rank", () => {
     expect(
-      calculateRank({ all_commits: false, commits: 0, prs: 0, issues: 0, reviews: 0, repos: 0, stars: 0, followers: 0 }),
+      calculateRank({
+        all_commits: false,
+        commits: 0,
+        prs: 0,
+        issues: 0,
+        reviews: 0,
+        repos: 0,
+        stars: 0,
+        followers: 0,
+      }),
     ).toStrictEqual({ level: "C", percentile: 100 });
   });
 
   it("median user gets B+ rank", () => {
     expect(
-      calculateRank({ all_commits: false, commits: 250, prs: 50, issues: 25, reviews: 10, repos: 0, stars: 50, followers: 10 }),
+      calculateRank({
+        all_commits: false,
+        commits: 250,
+        prs: 50,
+        issues: 25,
+        reviews: 10,
+        repos: 0,
+        stars: 50,
+        followers: 10,
+      }),
     ).toStrictEqual({ level: "B+", percentile: 46.09375 });
   });
 
   it("average user gets B+ rank (include_all_commits)", () => {
     expect(
-      calculateRank({ all_commits: true, commits: 1000, prs: 50, issues: 25, reviews: 10, repos: 0, stars: 50, followers: 10 }),
+      calculateRank({
+        all_commits: true,
+        commits: 1000,
+        prs: 50,
+        issues: 25,
+        reviews: 10,
+        repos: 0,
+        stars: 50,
+        followers: 10,
+      }),
     ).toStrictEqual({ level: "B+", percentile: 46.09375 });
   });
 
   it("sindresorhus gets S rank", () => {
     expect(
-      calculateRank({ all_commits: false, commits: 1300, prs: 1500, issues: 4500, reviews: 1000, repos: 0, stars: 600000, followers: 50000 }),
+      calculateRank({
+        all_commits: false,
+        commits: 1300,
+        prs: 1500,
+        issues: 4500,
+        reviews: 1000,
+        repos: 0,
+        stars: 600000,
+        followers: 50000,
+      }),
     ).toStrictEqual({ level: "S", percentile: 0.4578556547153667 });
   });
 });

@@ -17,7 +17,8 @@ const guardAccess = ({ id, type, colors }) => {
   }
 
   const currentWhitelist = type === "gist" ? gistWhitelist : whitelist;
-  const notWhitelistedMsg = type === "gist" ? NOT_WHITELISTED_GIST_MESSAGE : NOT_WHITELISTED_USERNAME_MESSAGE;
+  const notWhitelistedMsg =
+    type === "gist" ? NOT_WHITELISTED_GIST_MESSAGE : NOT_WHITELISTED_USERNAME_MESSAGE;
 
   if (Array.isArray(currentWhitelist) && !currentWhitelist.includes(id)) {
     const errorSvg = renderError({

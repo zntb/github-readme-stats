@@ -28,7 +28,14 @@ class Card {
     this.hideTitle = false;
     this.border_radius = border_radius;
     /** @type {{ titleColor: string; textColor: string; iconColor: string; bgColor: string | number[]; borderColor: string; ringColor?: string }} */
-    this.colors = colors;
+    this.colors = colors || {
+      titleColor: "#9f9f9f",
+      textColor: "#9f9f9f",
+      iconColor: "#9f9f9f",
+      bgColor: "#ffffff",
+      borderColor: "#e4e2e9",
+      ringColor: "#9f9f9f",
+    };
     this.title = customTitle === undefined ? encodeHTML(defaultTitle) : encodeHTML(customTitle);
     this.css = "";
     this.paddingX = 25;

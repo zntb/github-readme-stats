@@ -27,7 +27,11 @@ const CACHE_TTL = {
   TOP_LANGS_CARD: { DEFAULT: DURATIONS.SIX_DAY, MIN: DURATIONS.TWO_DAY, MAX: DURATIONS.TEN_DAY },
   PIN_CARD: { DEFAULT: DURATIONS.TEN_DAY, MIN: DURATIONS.ONE_DAY, MAX: DURATIONS.TEN_DAY },
   GIST_CARD: { DEFAULT: DURATIONS.TWO_DAY, MIN: DURATIONS.ONE_DAY, MAX: DURATIONS.TEN_DAY },
-  WAKATIME_CARD: { DEFAULT: DURATIONS.ONE_DAY, MIN: DURATIONS.TWELVE_HOURS, MAX: DURATIONS.TWO_DAY },
+  WAKATIME_CARD: {
+    DEFAULT: DURATIONS.ONE_DAY,
+    MIN: DURATIONS.TWELVE_HOURS,
+    MAX: DURATIONS.TWO_DAY,
+  },
   ERROR: DURATIONS.TEN_MINUTES,
 };
 
@@ -57,9 +61,7 @@ const buildCacheControl = (cacheSeconds) => {
  * @returns {string}
  */
 const buildErrorCacheControl = () => {
-  const envCacheSeconds = process.env.CACHE_SECONDS
-    ? parseInt(process.env.CACHE_SECONDS, 10)
-    : NaN;
+  const envCacheSeconds = process.env.CACHE_SECONDS ? parseInt(process.env.CACHE_SECONDS, 10) : NaN;
   if ((!isNaN(envCacheSeconds) && envCacheSeconds < 1) || process.env.NODE_ENV === "development") {
     return "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0";
   }

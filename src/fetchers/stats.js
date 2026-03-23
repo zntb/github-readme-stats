@@ -47,14 +47,25 @@ const fetcher = (variables, token) => {
   return request({ query, variables }, { Authorization: `bearer ${token}` });
 };
 
-const statsFetcher = async ({ username, includeMergedPullRequests, includeDiscussions, includeDiscussionsAnswers, startTime }) => {
+const statsFetcher = async ({
+  username,
+  includeMergedPullRequests,
+  includeDiscussions,
+  includeDiscussionsAnswers,
+  startTime,
+}) => {
   let stats;
   let hasNextPage = true;
   let endCursor = null;
   while (hasNextPage) {
     const variables = {
-      login: username, first: 100, after: endCursor,
-      includeMergedPullRequests, includeDiscussions, includeDiscussionsAnswers, startTime,
+      login: username,
+      first: 100,
+      after: endCursor,
+      includeMergedPullRequests,
+      includeDiscussions,
+      includeDiscussionsAnswers,
+      startTime,
     };
     let res = await retryer(fetcher, variables);
     if (res.data.errors) return res;
@@ -106,34 +117,57 @@ const totalCommitsFetcher = async (username) => {
 };
 
 const fetchStats = async (
-  username, include_all_commits = false, exclude_repo = [],
-  include_merged_pull_requests = false, include_discussions = false,
-  include_discussions_answers = false, commits_year,
+  username,
+  include_all_commits = false,
+  exclude_repo = [],
+  include_merged_pull_requests = false,
+  include_discussions = false,
+  include_discussions_answers = false,
+  commits_year,
 ) => {
   if (!username) throw new MissingParamError(["username"]);
 
   const stats = {
-    name: "", totalPRs: 0, totalPRsMerged: 0, mergedPRsPercentage: 0,
-    totalReviews: 0, totalCommits: 0, totalIssues: 0, totalStars: 0,
-    totalDiscussionsStarted: 0, totalDiscussionsAnswered: 0, contributedTo: 0,
+    name: "",
+    totalPRs: 0,
+    totalPRsMerged: 0,
+    mergedPRsPercentage: 0,
+    totalReviews: 0,
+    totalCommits: 0,
+    totalIssues: 0,
+    totalStars: 0,
+    totalDiscussionsStarted: 0,
+    totalDiscussionsAnswered: 0,
+    contributedTo: 0,
     rank: { level: "C", percentile: 100 },
   };
 
   let res = await statsFetcher({
-    username, includeMergedPullRequests: include_merged_pull_requests,
-    includeDiscussions: include_discussions, includeDiscussionsAnswers: include_discussions_answers,
+    username,
+    includeMergedPullRequests: include_merged_pull_requests,
+    includeDiscussions: include_discussions,
+    includeDiscussionsAnswers: include_discussions_answers,
     startTime: commits_year ? `${commits_year}-01-01T00:00:00Z` : undefined,
   });
 
   if (res.data.errors) {
     logger.error(res.data.errors);
     if (res.data.errors[0].type === "NOT_FOUND") {
-      throw new CustomError(res.data.errors[0].message || "Could not fetch user.", CustomError.USER_NOT_FOUND);
+      throw new CustomError(
+        res.data.errors[0].message || "Could not fetch user.",
+        CustomError.USER_NOT_FOUND,
+      );
     }
     if (res.data.errors[0].message) {
-      throw new CustomError(wrapTextMultiline(res.data.errors[0].message, 90, 1)[0], res.statusText);
+      throw new CustomError(
+        wrapTextMultiline(res.data.errors[0].message, 90, 1)[0],
+        res.statusText,
+      );
     }
-    throw new CustomError("Something went wrong while trying to retrieve the stats data using the GraphQL API.", CustomError.GRAPHQL_ERROR);
+    throw new CustomError(
+      "Something went wrong while trying to retrieve the stats data using the GraphQL API.",
+      CustomError.GRAPHQL_ERROR,
+    );
   }
 
   const user = res.data.data.user;
@@ -148,12 +182,14 @@ const fetchStats = async (
   stats.totalPRs = user.pullRequests.totalCount;
   if (include_merged_pull_requests) {
     stats.totalPRsMerged = user.mergedPullRequests.totalCount;
-    stats.mergedPRsPercentage = (user.mergedPullRequests.totalCount / user.pullRequests.totalCount) * 100 || 0;
+    stats.mergedPRsPercentage =
+      (user.mergedPullRequests.totalCount / user.pullRequests.totalCount) * 100 || 0;
   }
   stats.totalReviews = user.reviews.totalPullRequestReviewContributions;
   stats.totalIssues = user.openIssues.totalCount + user.closedIssues.totalCount;
   if (include_discussions) stats.totalDiscussionsStarted = user.repositoryDiscussions.totalCount;
-  if (include_discussions_answers) stats.totalDiscussionsAnswered = user.repositoryDiscussionComments.totalCount;
+  if (include_discussions_answers)
+    stats.totalDiscussionsAnswered = user.repositoryDiscussionComments.totalCount;
   stats.contributedTo = user.repositoriesContributedTo.totalCount;
 
   const allExcludedRepos = [...exclude_repo, ...excludeRepositories];
@@ -164,9 +200,13 @@ const fetchStats = async (
 
   stats.rank = calculateRank({
     all_commits: include_all_commits,
-    commits: stats.totalCommits, prs: stats.totalPRs, reviews: stats.totalReviews,
-    issues: stats.totalIssues, repos: user.repositories.totalCount,
-    stars: stats.totalStars, followers: user.followers.totalCount,
+    commits: stats.totalCommits,
+    prs: stats.totalPRs,
+    reviews: stats.totalReviews,
+    issues: stats.totalIssues,
+    repos: user.repositories.totalCount,
+    stars: stats.totalStars,
+    followers: user.followers.totalCount,
   });
 
   return stats;

@@ -1,5 +1,11 @@
 import { describe, expect, it, beforeEach } from "@jest/globals";
-import { resolveCacheSeconds, buildCacheControl, buildErrorCacheControl, CACHE_TTL, DURATIONS } from "../src/common/cache.js";
+import {
+  resolveCacheSeconds,
+  buildCacheControl,
+  buildErrorCacheControl,
+  CACHE_TTL,
+  DURATIONS,
+} from "../src/common/cache.js";
 
 beforeEach(() => {
   process.env.CACHE_SECONDS = undefined;

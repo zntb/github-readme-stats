@@ -4,8 +4,9 @@ import { request } from "../common/http.js";
 import { retryer } from "../common/retryer.js";
 
 const fetcher = (variables, token) => {
-  return request({
-    query: `
+  return request(
+    {
+      query: `
       fragment RepoInfo on Repository {
         name nameWithOwner isPrivate isArchived isTemplate
         stargazers { totalCount }
@@ -18,8 +19,10 @@ const fetcher = (variables, token) => {
         organization(login: $login) { repository(name: $repo) { ...RepoInfo } }
       }
     `,
-    variables,
-  }, { Authorization: `token ${token}` });
+      variables,
+    },
+    { Authorization: `token ${token}` },
+  );
 };
 
 const urlExample = "/api/pin?username=USERNAME&amp;repo=REPO_NAME";
@@ -38,12 +41,17 @@ const fetchRepo = async (username, reponame) => {
   const isOrg = data.user === null && data.organization;
 
   if (isUser) {
-    if (!data.user.repository || data.user.repository.isPrivate) throw new Error("User Repository Not found");
+    if (!data.user.repository || data.user.repository.isPrivate)
+      throw new Error("User Repository Not found");
     return { ...data.user.repository, starCount: data.user.repository.stargazers.totalCount };
   }
   if (isOrg) {
-    if (!data.organization.repository || data.organization.repository.isPrivate) throw new Error("Organization Repository Not found");
-    return { ...data.organization.repository, starCount: data.organization.repository.stargazers.totalCount };
+    if (!data.organization.repository || data.organization.repository.isPrivate)
+      throw new Error("Organization Repository Not found");
+    return {
+      ...data.organization.repository,
+      starCount: data.organization.repository.stargazers.totalCount,
+    };
   }
   throw new Error("Unexpected behavior");
 };

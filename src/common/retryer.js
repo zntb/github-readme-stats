@@ -17,8 +17,7 @@ const retryer = async (fetcher, variables, retries = 0) => {
     const errors = response?.data?.errors;
     const errorType = errors?.[0]?.type;
     const errorMsg = errors?.[0]?.message || "";
-    const isRateLimited =
-      (errors && errorType === "RATE_LIMITED") || /rate limit/i.test(errorMsg);
+    const isRateLimited = (errors && errorType === "RATE_LIMITED") || /rate limit/i.test(errorMsg);
     if (isRateLimited) {
       logger.log(`PAT_${retries + 1} Failed`);
       retries++;

@@ -2,14 +2,17 @@
   "name": "github-readme-stats",
   "version": "1.0.0",
   "description": "Dynamically generate stats for your GitHub readme",
+  "author": "zntb (forked from Anurag Hazra)",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "lint": "eslint",
+    "test": "node node_modules/jest/bin/jest.js --coverage",
+    "test:watch": "node node_modules/jest/bin/jest.js --watch",
+    "bench": "node node_modules/jest/bin/jest.js --config jest.bench.config.js",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -26,6 +29,8 @@
   "devDependencies": {
     "@actions/core": "^2.0.3",
     "@actions/github": "^6.0.1",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-typescript": "^7.28.5",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.2",
     "@tailwindcss/postcss": "^4.1.8",
@@ -44,6 +49,9 @@
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
   },
   "engines": {
     "node": ">=22"

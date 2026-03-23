@@ -8,7 +8,8 @@ class I18n {
   }
   t(str) {
     if (!this.translations[str]) throw new Error(`${str} Translation string not found`);
-    if (!this.translations[str][this.locale]) throw new Error(`'${str}' translation not found for locale '${this.locale}'`);
+    if (!this.translations[str][this.locale])
+      throw new Error(`'${str}' translation not found for locale '${this.locale}'`);
     return this.translations[str][this.locale];
   }
 }

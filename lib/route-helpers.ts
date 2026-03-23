@@ -14,10 +14,7 @@ export function getQuery(request: NextRequest): Record<string, string> {
 /**
  * Return an SVG response with proper headers.
  */
-export function svgResponse(
-  svg: string,
-  cacheControl?: string,
-): NextResponse {
+export function svgResponse(svg: string, cacheControl?: string): NextResponse {
   return new NextResponse(svg, {
     status: 200,
     headers: {

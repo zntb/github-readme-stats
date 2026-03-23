@@ -7,8 +7,9 @@ import { wrapTextMultiline } from "../common/fmt.js";
 import { request } from "../common/http.js";
 
 const fetcher = (variables, token) => {
-  return request({
-    query: `
+  return request(
+    {
+      query: `
       query userInfo($login: String!) {
         user(login: $login) {
           repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
@@ -22,11 +23,18 @@ const fetcher = (variables, token) => {
         }
       }
     `,
-    variables,
-  }, { Authorization: `token ${token}` });
+      variables,
+    },
+    { Authorization: `token ${token}` },
+  );
 };
 
-const fetchTopLanguages = async (username, exclude_repo = [], size_weight = 1, count_weight = 0) => {
+const fetchTopLanguages = async (
+  username,
+  exclude_repo = [],
+  size_weight = 1,
+  count_weight = 0,
+) => {
   if (!username) throw new MissingParamError(["username"]);
 
   const res = await retryer(fetcher, { login: username });
@@ -34,10 +42,16 @@ const fetchTopLanguages = async (username, exclude_repo = [], size_weight = 1, c
   if (res.data.errors) {
     logger.error(res.data.errors);
     if (res.data.errors[0].type === "NOT_FOUND") {
-      throw new CustomError(res.data.errors[0].message || "Could not fetch user.", CustomError.USER_NOT_FOUND);
+      throw new CustomError(
+        res.data.errors[0].message || "Could not fetch user.",
+        CustomError.USER_NOT_FOUND,
+      );
     }
     if (res.data.errors[0].message) {
-      throw new CustomError(wrapTextMultiline(res.data.errors[0].message, 90, 1)[0], res.statusText);
+      throw new CustomError(
+        wrapTextMultiline(res.data.errors[0].message, 90, 1)[0],
+        res.statusText,
+      );
     }
     throw new CustomError(
       "Something went wrong while trying to retrieve the language data using the GraphQL API.",
@@ -48,11 +62,12 @@ const fetchTopLanguages = async (username, exclude_repo = [], size_weight = 1, c
   let repoNodes = res.data.data.user.repositories.nodes;
   let repoToHide = {};
   const allExcludedRepos = [...exclude_repo, ...excludeRepositories];
-  if (allExcludedRepos) allExcludedRepos.forEach((repoName) => { repoToHide[repoName] = true; });
+  if (allExcludedRepos)
+    allExcludedRepos.forEach((repoName) => {
+      repoToHide[repoName] = true;
+    });
 
-  repoNodes = repoNodes
-    .sort((a, b) => b.size - a.size)
-    .filter((name) => !repoToHide[name.name]);
+  repoNodes = repoNodes.sort((a, b) => b.size - a.size).filter((name) => !repoToHide[name.name]);
 
   let repoCount = 0;
   repoNodes = repoNodes
@@ -66,16 +81,28 @@ const fetchTopLanguages = async (username, exclude_repo = [], size_weight = 1, c
       } else {
         repoCount = 1;
       }
-      return { ...acc, [prev.node.name]: { name: prev.node.name, color: prev.node.color, size: langSize, count: repoCount } };
+      return {
+        ...acc,
+        [prev.node.name]: {
+          name: prev.node.name,
+          color: prev.node.color,
+          size: langSize,
+          count: repoCount,
+        },
+      };
     }, {});
 
   Object.keys(repoNodes).forEach((name) => {
-    repoNodes[name].size = Math.pow(repoNodes[name].size, size_weight) * Math.pow(repoNodes[name].count, count_weight);
+    repoNodes[name].size =
+      Math.pow(repoNodes[name].size, size_weight) * Math.pow(repoNodes[name].count, count_weight);
   });
 
   const topLangs = Object.keys(repoNodes)
     .sort((a, b) => repoNodes[b].size - repoNodes[a].size)
-    .reduce((result, key) => { result[key] = repoNodes[key]; return result; }, {});
+    .reduce((result, key) => {
+      result[key] = repoNodes[key];
+      return result;
+    }, {});
 
   return topLangs;
 };

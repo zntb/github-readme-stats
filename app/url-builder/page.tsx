@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 
 type CardType = "stats" | "pin" | "top-langs" | "streak" | "gist" | "wakatime";
 
@@ -83,7 +83,7 @@ export default function URLBuilder() {
   });
   const [advanced, setAdvanced] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [mounted] = useState(true); // Always true on client - no hydration issue for this use case
 
   const [statsUsername, setStatsUsername] = useState("");
   const [statsTitle, setStatsTitle] = useState("");
@@ -117,10 +117,6 @@ export default function URLBuilder() {
   const [hideBorder, setHideBorder] = useState(false);
   const [hideTitle, setHideTitle] = useState(false);
   const [disableAnimations, setDisableAnimations] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const buildUrl = useCallback((): { url: string; valid: boolean } => {
     const params = new URLSearchParams();
