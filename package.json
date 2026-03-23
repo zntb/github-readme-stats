@@ -18,9 +18,9 @@
     "axios": "^1.13.6",
     "emoji-name-map": "^2.0.3",
     "github-username-regex": "^1.0.0",
-    "next": "^15.3.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "next": "^16.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "word-wrap": "^1.2.5"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "@uppercod/css-to-object": "^1.1.1",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^15.3.2",
+    "eslint-config-next": "^16.2.1",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "prettier": "^3.8.1",
