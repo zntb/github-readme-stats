@@ -16,9 +16,7 @@ describe("I18n", () => {
       locale: "en",
       translations: statCardLocales({ name: "Anurag Hazra", apostrophe: "s" }),
     });
-    expect(() => i18n.t("statcard.title1")).toThrow(
-      "statcard.title1 Translation string not found",
-    );
+    expect(() => i18n.t("statcard.title1")).toThrow("statcard.title1 Translation string not found");
   });
 
   it("should throw error if translation not found for locale", () => {

@@ -1,18 +1,34 @@
-.vercel
+# Dependencies
+node_modules/
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+
+# Production
+build/
+dist/
+
+# Env
 .env
-node_modules
-*.lock
+.env.local
+.env.*.local
+
+# Debug
+npm-debug.log*
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
 .idea/
-coverage
-benchmarks
-vercel_token
+*.swp
 
-# IDE
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-*.code-workspace
-
+# Vercel
 .vercel
-
-app-features.md

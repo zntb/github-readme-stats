@@ -1,20 +1,12 @@
 {
-  "functions": {
-    "api/*.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  },
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/url-builder",
-      "destination": "/api/url-builder"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "https://github.com/zntb/github-readme-stats"
+      "destination": "/url-builder"
     }
   ]
 }

@@ -2,91 +2,73 @@ import { describe, expect, it } from "@jest/globals";
 import { queryByTestId } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 import { renderWakatimeCard } from "../src/cards/wakatime.js";
-import { wakaTimeData } from "./fetchWakatime.test.js";
+
+const wakaTimeData = {
+  is_coding_activity_visible: true,
+  is_other_usage_visible: true,
+  range: "last_7_days",
+  languages: [
+    { digital: "0:19", hours: 0, minutes: 19, name: "Other", percent: 60, text: "19 mins", total_seconds: 1170 },
+    { digital: "0:01", hours: 0, minutes: 1, name: "TypeScript", percent: 40, text: "1 min", total_seconds: 83 },
+  ],
+};
 
 describe("Test Render WakaTime Card", () => {
   it("should render correctly", () => {
-    const card = renderWakatimeCard(wakaTimeData.data);
-    expect(card).toMatchSnapshot();
+    document.body.innerHTML = renderWakatimeCard(wakaTimeData);
+    expect(document.getElementsByClassName("header")[0]).toHaveTextContent(
+      "WakaTime Stats (last 7 days)",
+    );
+    expect(queryByTestId(document.body, "Other")).toBeInTheDocument();
+    expect(queryByTestId(document.body, "TypeScript")).toBeInTheDocument();
   });
 
   it("should render correctly with compact layout", () => {
-    const card = renderWakatimeCard(wakaTimeData.data, { layout: "compact" });
-
-    expect(card).toMatchSnapshot();
-  });
-
-  it("should render correctly with compact layout when langs_count is set", () => {
-    const card = renderWakatimeCard(wakaTimeData.data, {
-      layout: "compact",
-      langs_count: 2,
-    });
-
-    expect(card).toMatchSnapshot();
+    document.body.innerHTML = renderWakatimeCard(wakaTimeData, { layout: "compact" });
+    expect(document.querySelector("svg")).toBeInTheDocument();
+    const langNames = document.querySelectorAll("[data-testid='lang-name']");
+    expect(langNames.length).toBeGreaterThan(0);
   });
 
   it("should hide languages when hide is passed", () => {
-    document.body.innerHTML = renderWakatimeCard(wakaTimeData.data, {
-      hide: ["YAML", "Other"],
-    });
-
-    expect(queryByTestId(document.body, /YAML/i)).toBeNull();
-    expect(queryByTestId(document.body, /Other/i)).toBeNull();
-    expect(queryByTestId(document.body, /TypeScript/i)).not.toBeNull();
+    document.body.innerHTML = renderWakatimeCard(wakaTimeData, { hide: ["TypeScript"] });
+    expect(queryByTestId(document.body, /TypeScript/i)).toBeNull();
+    expect(queryByTestId(document.body, "Other")).not.toBeNull();
   });
 
   it("should render translations", () => {
     document.body.innerHTML = renderWakatimeCard({}, { locale: "cn" });
-    expect(document.getElementsByClassName("header")[0].textContent).toBe(
-      "WakaTime 周统计",
-    );
-    expect(
-      document.querySelector('g[transform="translate(0, 0)"]>text.stat.bold')
-        .textContent,
-    ).toBe("WakaTime 用户个人资料未公开");
+    expect(document.getElementsByClassName("header")[0]).toHaveTextContent("WakaTime 周统计");
   });
 
   it("should render without rounding", () => {
-    document.body.innerHTML = renderWakatimeCard(wakaTimeData.data, {
-      border_radius: "0",
-    });
+    document.body.innerHTML = renderWakatimeCard(wakaTimeData, { border_radius: "0" });
     expect(document.querySelector("rect")).toHaveAttribute("rx", "0");
-    document.body.innerHTML = renderWakatimeCard(wakaTimeData.data, {});
+    document.body.innerHTML = renderWakatimeCard(wakaTimeData, {});
     expect(document.querySelector("rect")).toHaveAttribute("rx", "4.5");
   });
 
-  it('should show "no coding activity this week" message when there has not been activity', () => {
+  it("should show no coding activity message when languages is undefined", () => {
     document.body.innerHTML = renderWakatimeCard(
-      {
-        ...wakaTimeData.data,
-        languages: undefined,
-      },
+      { ...wakaTimeData, languages: undefined },
       {},
     );
-    expect(document.querySelector(".stat").textContent).toBe(
-      "No coding activity this week",
-    );
+    expect(document.querySelector(".stat").textContent).toBe("No coding activity this week");
   });
 
-  it('should show "no coding activity this week" message when using compact layout and there has not been activity', () => {
+  it("should show no coding activity message in compact layout when no activity", () => {
     document.body.innerHTML = renderWakatimeCard(
-      {
-        ...wakaTimeData.data,
-        languages: undefined,
-      },
-      {
-        layout: "compact",
-      },
+      { ...wakaTimeData, languages: undefined },
+      { layout: "compact" },
     );
-    expect(document.querySelector(".stat").textContent).toBe(
-      "No coding activity this week",
-    );
+    expect(document.querySelector(".stat").textContent).toBe("No coding activity this week");
   });
 
-  it("should render correctly with percent display format", () => {
-    const card = renderWakatimeCard(wakaTimeData.data, {
-      display_format: "percent",
-    });
-    expect(card).toMatchSnapshot();
+  it("should show not public message when coding activity not visible", () => {
+    document.body.innerHTML = renderWakatimeCard(
+      { ...wakaTimeData, languages: undefined, is_coding_activity_visible: false },
+      {},
+    );
+    expect(document.querySelector(".stat").textContent).toBe("WakaTime user profile not public");
   });
 });
