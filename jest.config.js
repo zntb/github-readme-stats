@@ -20,10 +20,15 @@ const jestConfig = {
   },
   // Transform all JS files with babel
   transform: {
-    "^.+\\.js$": "babel-jest",
+    "^.+\\.js$": [
+      "babel-jest",
+      {
+        presets: [["@babel/preset-env", { targets: { node: "current" } }]],
+      },
+    ],
   },
   // Don't transform node_modules
   transformIgnorePatterns: ["/node_modules/"],
 };
 
-export default jestConfig;
+module.exports = jestConfig;
