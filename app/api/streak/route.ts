@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     hide_border,
     hide_title,
     custom_title,
+    card_width,
   } = q;
 
   const colorOpts = { title_color, text_color, bg_color, border_color, theme };
@@ -63,6 +64,7 @@ export async function GET(request: NextRequest) {
       hide_border: hide_border === "1" || hide_border === "true",
       hide_title: hide_title === "1" || hide_title === "true",
       custom_title,
+      card_width: parseInt(card_width, 10),
     });
 
     return new NextResponse(svg, {

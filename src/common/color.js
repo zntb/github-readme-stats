@@ -25,9 +25,11 @@ const getCardColors = ({
 }) => {
   const defaultTheme = themes["default"];
   const isThemeProvided = theme !== null && theme !== undefined;
-  const selectedTheme = isThemeProvided ? themes[theme] : defaultTheme;
+  const selectedTheme = isThemeProvided && themes[theme] ? themes[theme] : defaultTheme;
   const defaultBorderColor =
-    "border_color" in selectedTheme ? selectedTheme.border_color : defaultTheme.border_color;
+    selectedTheme && "border_color" in selectedTheme
+      ? selectedTheme.border_color
+      : defaultTheme.border_color;
 
   const titleColor = fallbackColor(
     title_color || selectedTheme.title_color,

@@ -6,7 +6,8 @@ import { flexLayout } from "../common/render.js";
 import { icons } from "../common/icons.js";
 
 const CARD_MIN_WIDTH = 300;
-const CARD_DEFAULT_WIDTH = 300;
+const CARD_DEFAULT_WIDTH = 350;
+const CARD_MAX_WIDTH = 600;
 
 const createStatItem = (icon, value, testid) => {
   const iconSvg = `
@@ -15,7 +16,7 @@ const createStatItem = (icon, value, testid) => {
     </svg>
   `;
   const text = `<text data-testid="${testid}" class="stat">${value}</text>`;
-  return flexLayout({ items: [iconSvg, text], gap: 20, direction: "row" }).join("");
+  return flexLayout({ items: [iconSvg, text], gap: 10, direction: "row" }).join("");
 };
 
 const renderStreakCard = (streakData, options = {}) => {
@@ -32,6 +33,7 @@ const renderStreakCard = (streakData, options = {}) => {
     hide_title = false,
     custom_title,
     ring_color,
+    card_width,
   } = options;
 
   const { titleColor, textColor, iconColor, bgColor, borderColor } = getCardColors({
@@ -44,8 +46,18 @@ const renderStreakCard = (streakData, options = {}) => {
     theme,
   });
 
+  let width = card_width
+    ? isNaN(card_width)
+      ? CARD_DEFAULT_WIDTH
+      : card_width < CARD_MIN_WIDTH
+        ? CARD_MIN_WIDTH
+        : card_width > CARD_MAX_WIDTH
+          ? CARD_MAX_WIDTH
+          : card_width
+    : CARD_DEFAULT_WIDTH;
+
   const card = new Card({
-    width: CARD_DEFAULT_WIDTH,
+    width,
     height: 150,
     border_radius,
     customTitle: custom_title,
@@ -67,7 +79,7 @@ const renderStreakCard = (streakData, options = {}) => {
     createStatItem(icons.contribs, kFormatter(totalContributingDays), "totalContributingDays"),
   ];
 
-  const body = flexLayout({ items: statItems, gap: 25, direction: "row" }).join("");
+  const body = flexLayout({ items: statItems, gap: 15, direction: "row" }).join("");
 
   card.setCSS(`
     .stat { font: 800 15px "Segoe UI", Ubuntu, "Helvetica Neue", Sans-Serif, sans-serif; fill: ${textColor}; }
