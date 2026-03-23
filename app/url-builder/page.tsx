@@ -9,7 +9,6 @@ const THEMES = [
   "default",
   "dark",
   "algolia",
-  "ambient_gradient",
   "apprentice",
   "aura",
   "aura_dark",
@@ -63,6 +62,19 @@ const THEMES = [
   "transparent",
   "yeblu",
 ];
+
+const GRADIENT_TEMPLATES = [
+  { id: "sunset", name: "Sunset", angle: 135, colors: ["#ff6b6b", "#feca57", "#ff9ff3"] },
+  { id: "ocean", name: "Ocean", angle: 45, colors: ["#2b5876", "#4e4376"] },
+  { id: "midnight", name: "Midnight", angle: 90, colors: ["#0f2027", "#203a43", "#2c5364"] },
+  { id: "aurora", name: "Aurora", angle: 45, colors: ["#00c9ff", "#92fe9d"] },
+  { id: "candy", name: "Candy", angle: 45, colors: ["#d53369", "#daae51"] },
+  { id: "deepsea", name: "Deep Sea", angle: 90, colors: ["#1a2988", "#26d0ce"] },
+  { id: "purple-love", name: "Purple Love", angle: 45, colors: ["#cc2b5e", "#753a88"] },
+  { id: "flamingo", name: "Flamingo", angle: 45, colors: ["#d53369", "#daae51"] },
+];
+
+const GRADIENT_THEMES = ["ambient_gradient"];
 
 interface ColorConfig {
   titleColor: string;
@@ -119,10 +131,58 @@ export default function URLBuilder() {
   const [hideTitle, setHideTitle] = useState(false);
   const [disableAnimations, setDisableAnimations] = useState(false);
 
+  // Gradient background state
+  const [gradientEnabled, setGradientEnabled] = useState(false);
+  const [selectedGradient, setSelectedGradient] = useState("");
+  const [gradientAngle, setGradientAngle] = useState(135);
+  const [gradientColor1, setGradientColor1] = useState("#ff6b6b");
+  const [gradientColor2, setGradientColor2] = useState("#feca57");
+
   const buildUrl = useCallback((): { url: string; valid: boolean } => {
     const params = new URLSearchParams();
 
-    if (theme) {
+    // Handle gradient background
+    if (gradientEnabled && (selectedGradient || gradientColor1 || gradientColor2)) {
+      // Check if a template is selected and user hasn't modified the colors
+      const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient);
+      const isTheme = GRADIENT_THEMES.includes(selectedGradient);
+
+      if (template) {
+        // Template gradient - check if user has modified the angle or first two colors
+        // (only compare first 2 colors since UI only supports 2)
+        const templateFirstColor = template.colors[0];
+        const templateSecondColor = template.colors[1] || template.colors[0];
+        const userHasModifiedColors =
+          gradientAngle !== template.angle ||
+          gradientColor1 !== templateFirstColor ||
+          gradientColor2 !== templateSecondColor;
+
+        if (!userHasModifiedColors) {
+          // User hasn't modified - use template's full color list (supports 3+ colors)
+          const templateColors = template.colors.map((c: string) => c.replace("#", ""));
+          params.set("bg_color", [template.angle, ...templateColors].join(","));
+        } else {
+          // User has modified - use their custom values
+          const c1 = gradientColor1.replace("#", "");
+          const c2 = gradientColor2.replace("#", "");
+          params.set("bg_color", [gradientAngle, c1, c2].join(","));
+        }
+      } else if (isTheme) {
+        // Theme name (like ambient_gradient)
+        params.set("theme", selectedGradient);
+      } else {
+        // Custom gradient colors from color pickers (only if not default or if explicitly set)
+        const c1 = gradientColor1.replace("#", "");
+        const c2 = gradientColor2.replace("#", "");
+        params.set("bg_color", [gradientAngle, c1, c2].join(","));
+      }
+      // Allow color customization with gradient background
+      const hex = (c: string) => c.replace("#", "");
+      if (hex(colors.titleColor) !== "2f80ed") params.set("title_color", hex(colors.titleColor));
+      if (hex(colors.iconColor) !== "4c71f2") params.set("icon_color", hex(colors.iconColor));
+      if (hex(colors.textColor) !== "434d58") params.set("text_color", hex(colors.textColor));
+      if (hex(colors.borderColor) !== "e4e2e2") params.set("border_color", hex(colors.borderColor));
+    } else if (theme) {
       params.set("theme", theme);
     } else {
       const hex = (c: string) => c.replace("#", "");
@@ -201,6 +261,11 @@ export default function URLBuilder() {
     cardType,
     theme,
     colors,
+    gradientEnabled,
+    selectedGradient,
+    gradientAngle,
+    gradientColor1,
+    gradientColor2,
     borderRadius,
     cardWidth,
     cacheSeconds,
@@ -552,6 +617,143 @@ export default function URLBuilder() {
                     ))}
                   </select>
                 </FormGroup>
+
+                {/* Gradient Background Section */}
+                <div className="pt-2 border-t border-card-border/30">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-sm font-semibold text-text">Background</span>
+                  </div>
+                  <label className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary/50 border border-card-border/50 hover:border-primary/30 transition-all cursor-pointer mb-3">
+                    <input
+                      type="checkbox"
+                      checked={gradientEnabled}
+                      onChange={(e) => {
+                        setGradientEnabled(e.target.checked);
+                        if (!e.target.checked) setSelectedGradient("");
+                      }}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium text-text">Gradient Background</span>
+                  </label>
+
+                  {gradientEnabled && (
+                    <div className="space-y-4 mt-4 animate-fade-in-up">
+                      {/* Gradient Template Selection */}
+                      <FormGroup label="Gradient Templates" description="Choose a preset gradient or enter custom colors">
+                        <select
+                          value={selectedGradient}
+                          onChange={(e) => {
+                            const selectedId = e.target.value;
+                            setSelectedGradient(selectedId);
+                            // Sync custom color inputs with template when selected
+                            const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedId);
+                            if (template) {
+                              setGradientAngle(template.angle);
+                              setGradientColor1(template.colors[0]);
+                              // Use second color if available, otherwise repeat first
+                              setGradientColor2(template.colors[1] || template.colors[0]);
+                            }
+                          }}
+                          className="font-mono"
+                        >
+                          <option value="">Select a template...</option>
+                          {GRADIENT_TEMPLATES.map((g) => (
+                            <option key={g.id} value={g.id}>
+                              {g.name}
+                            </option>
+                          ))}
+                          {GRADIENT_THEMES.map((t) => (
+                            <option key={t} value={t}>
+                              {t.replace(/_/g, " ")}
+                            </option>
+                          ))}
+                        </select>
+                      </FormGroup>
+
+                      {/* Custom Gradient Colors with Color Pickers */}
+                      <div className="space-y-3">
+                        <span className="text-sm font-medium text-text-secondary">Custom Colors</span>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-xs text-text-secondary">Color 1</label>
+                            <div className="flex gap-2 items-center">
+                              <input
+                                type="color"
+                                value={gradientColor1}
+                                onChange={(e) => setGradientColor1(e.target.value)}
+                                className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
+                              />
+                              <input
+                                type="text"
+                                value={gradientColor1}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setGradientColor1(v);
+                                }}
+                                className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-2 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs text-text-secondary">Color 2</label>
+                            <div className="flex gap-2 items-center">
+                              <input
+                                type="color"
+                                value={gradientColor2}
+                                onChange={(e) => setGradientColor2(e.target.value)}
+                                className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
+                              />
+                              <input
+                                type="text"
+                                value={gradientColor2}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setGradientColor2(v);
+                                }}
+                                className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-2 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs text-text-secondary">Angle: {gradientAngle}°</label>
+                          <input
+                            type="range"
+                            min="0"
+                            max="360"
+                            step="15"
+                            value={gradientAngle}
+                            onChange={(e) => setGradientAngle(parseInt(e.target.value))}
+                            className="w-full h-2 bg-bg-tertiary rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Preview of selected gradient */}
+                      {(gradientColor1 || gradientColor2 || selectedGradient || GRADIENT_TEMPLATES.find(g => g.id === selectedGradient)) && (
+                        <div className="space-y-2">
+                          <span className="text-sm font-medium text-text-secondary">Preview</span>
+                          <div
+                            className="h-16 rounded-lg border border-card-border"
+                            style={{
+                              background: (() => {
+                                const template = GRADIENT_TEMPLATES.find(g => g.id === selectedGradient);
+                                if (template) {
+                                  return `linear-gradient(${template.angle}deg, ${template.colors.join(", ")})`;
+                                } else if (GRADIENT_THEMES.includes(selectedGradient)) {
+                                  // Show ambient gradient for themes
+                                  return "linear-gradient(135deg, #23a58d, #c850c0, #ffcc70)";
+                                } else {
+                                  return `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
+                                }
+                              })()
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {!theme && (
                   <div className="space-y-4 pt-2">
