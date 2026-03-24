@@ -13,6 +13,8 @@
     "lint": "eslint",
     "test": "node node_modules/jest/bin/jest.js --coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
+    "test:update:snapshot": "node node_modules/jest/bin/jest.js --updateSnapshot",
+    "test:e2e": "node node_modules/jest/bin/jest.js --config jest.e2e.config.cjs",
     "bench": "node node_modules/jest/bin/jest.js --config jest.bench.config.cjs",
     "type-check": "tsc --noEmit",
     "theme-readme-gen": "node scripts/generate-theme-doc",
