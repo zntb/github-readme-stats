@@ -289,15 +289,16 @@ export function buildMultiHtml(
 ): string {
   if (multiUrls.length === 0) return "";
 
-  // GitHub doesn't fully support CSS gap in flex/grid, so we use table layout
-  // This is the most reliable way to display cards side by side in GitHub readmes
+  // Use simple approach: render images directly one after another with spacing
+  // This is the most compatible for GitHub readmes
   const images = multiUrls
     .map((u, i) => {
       const h = multiCards[i]?.height ?? Number(multiCardWidth) ?? 200;
-      return `<td><a href="${u}"><img height="${h}" src="${u}" alt="GitHub Card" /></a></td>`;
+      // Add horizontal spacing between cards (except last one)
+      const spacing = i < multiUrls.length - 1 ? ` margin-right: ${gap}` : "";
+      return `<a href="${u}" style="display: inline-block${spacing}"><img height="${h}" src="${u}" alt="GitHub Card" style="height: ${h}px" /></a>`;
     })
     .join("\n");
 
-  // Use table for reliable side-by-side layout in GitHub
-  return `<table>\n  <tr>\n${images}\n  </tr>\n</table>`;
+  return images;
 }
