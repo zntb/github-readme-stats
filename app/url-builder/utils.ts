@@ -285,15 +285,20 @@ export function buildMultiHtml(
   multiUrls: string[],
   multiCards: MultiCard[],
   multiCardWidth: string,
+  gap: string = "10px",
 ): string {
   if (multiUrls.length === 0) return "";
 
+  // GitHub doesn't support CSS gap property, so we use margins instead
   const multiHtml = multiUrls
     .map((u, i) => {
       const h = multiCards[i]?.height ?? Number(multiCardWidth) ?? 200;
-      return `  <img height="${h}" src="${u}" alt="GitHub Card" />`;
+      const isLast = i === multiUrls.length - 1;
+      // Use margin-right for spacing (except on last item), add border for links
+      const spacingStyle = isLast ? "" : `margin-right: ${gap}`;
+      return `  <a href="${u}" style="display: inline-block; ${spacingStyle}"><img height="${h}" src="${u}" alt="GitHub Card" /></a>`;
     })
     .join("\n");
 
-  return `<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;">\n${multiHtml}\n</div>`;
+  return `<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center">\n${multiHtml}\n</div>`;
 }

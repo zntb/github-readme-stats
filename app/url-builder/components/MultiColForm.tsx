@@ -10,6 +10,8 @@ interface MultiColFormProps {
   onRemoveCard: (id: string) => void;
   onUpdateCard: (id: string, updates: Partial<MultiCard>) => void;
   onCardWidthChange: (value: string) => void;
+  gap: string;
+  onGapChange: (value: string) => void;
 }
 
 export function MultiColForm({
@@ -20,6 +22,8 @@ export function MultiColForm({
   onRemoveCard,
   onUpdateCard,
   onCardWidthChange,
+  gap,
+  onGapChange,
 }: MultiColFormProps) {
   return (
     <div className="space-y-4 animate-fade-in-up animate-delay-200">
@@ -40,6 +44,19 @@ export function MultiColForm({
           max="500"
           placeholder="200"
           onChange={(e) => onCardWidthChange(e.target.value)}
+          className="font-mono"
+        />
+      </FormGroup>
+
+      <FormGroup
+        label="Gap between cards"
+        description="Space between cards in the HTML snippet (e.g., 10px, 20px)."
+      >
+        <input
+          type="text"
+          value={gap}
+          placeholder="10px"
+          onChange={(e) => onGapChange(e.target.value)}
           className="font-mono"
         />
       </FormGroup>

@@ -108,6 +108,7 @@ export default function URLBuilder() {
     },
   ]);
   const [multiCardWidth, setMultiCardWidth] = useState("400");
+  const [multiGap, setMultiGap] = useState("10px");
   const [htmlCopied, setHtmlCopied] = useState(false);
 
   // Load global username from localStorage on mount
@@ -309,7 +310,7 @@ export default function URLBuilder() {
   const multiValid = cardType === "multi" && multiUrls.length > 0;
 
   // Generate HTML for multi-col
-  const multiHtmlSnippet = multiValid ? buildMultiHtml(multiUrls, multiCards, multiCardWidth) : "";
+  const multiHtmlSnippet = multiValid ? buildMultiHtml(multiUrls, multiCards, multiCardWidth, multiGap) : "";
 
   const copyUrl = async () => {
     if (valid && url) {
@@ -443,6 +444,8 @@ export default function URLBuilder() {
                     onRemoveCard={removeMultiCard}
                     onUpdateCard={updateMultiCard}
                     onCardWidthChange={setMultiCardWidth}
+                    gap={multiGap}
+                    onGapChange={setMultiGap}
                   />
                 )}
               </div>
