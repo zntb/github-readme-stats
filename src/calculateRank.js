@@ -6,6 +6,7 @@ function log_normal_cdf(x) {
   return x / (1 + x);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function calculateRank({ all_commits, commits, prs, issues, reviews, repos, stars, followers }) {
   const COMMITS_MEDIAN = all_commits ? 1000 : 250,
     COMMITS_WEIGHT = 2;

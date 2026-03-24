@@ -14,8 +14,6 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "coverage/**",
-    "src/**/*.js", // legacy JS source — linted separately if needed
-    "themes/**",
   ]),
   {
     rules: {

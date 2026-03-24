@@ -649,7 +649,10 @@ export default function URLBuilder() {
                   {gradientEnabled && (
                     <div className="space-y-4 mt-4 animate-fade-in-up">
                       {/* Gradient Template Selection */}
-                      <FormGroup label="Gradient Templates" description="Choose a preset gradient or enter custom colors">
+                      <FormGroup
+                        label="Gradient Templates"
+                        description="Choose a preset gradient or enter custom colors"
+                      >
                         <select
                           value={selectedGradient}
                           onChange={(e) => {
@@ -682,7 +685,9 @@ export default function URLBuilder() {
 
                       {/* Custom Gradient Colors with Color Pickers */}
                       <div className="space-y-3">
-                        <span className="text-sm font-medium text-text-secondary">Custom Colors</span>
+                        <span className="text-sm font-medium text-text-secondary">
+                          Custom Colors
+                        </span>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <label className="text-xs text-text-secondary">Color 1</label>
@@ -726,7 +731,9 @@ export default function URLBuilder() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs text-text-secondary">Angle: {gradientAngle}°</label>
+                          <label className="text-xs text-text-secondary">
+                            Angle: {gradientAngle}°
+                          </label>
                           <input
                             type="range"
                             min="0"
@@ -740,14 +747,19 @@ export default function URLBuilder() {
                       </div>
 
                       {/* Preview of selected gradient */}
-                      {(gradientColor1 || gradientColor2 || selectedGradient || GRADIENT_TEMPLATES.find(g => g.id === selectedGradient)) && (
+                      {(gradientColor1 ||
+                        gradientColor2 ||
+                        selectedGradient ||
+                        GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient)) && (
                         <div className="space-y-2">
                           <span className="text-sm font-medium text-text-secondary">Preview</span>
                           <div
                             className="h-16 rounded-lg border border-card-border"
                             style={{
                               background: (() => {
-                                const template = GRADIENT_TEMPLATES.find(g => g.id === selectedGradient);
+                                const template = GRADIENT_TEMPLATES.find(
+                                  (g) => g.id === selectedGradient,
+                                );
                                 if (template) {
                                   return `linear-gradient(${template.angle}deg, ${template.colors.join(", ")})`;
                                 } else if (GRADIENT_THEMES.includes(selectedGradient)) {
@@ -756,7 +768,7 @@ export default function URLBuilder() {
                                 } else {
                                   return `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
                                 }
-                              })()
+                              })(),
                             }}
                           />
                         </div>
@@ -1017,15 +1029,35 @@ export default function URLBuilder() {
                       >
                         {markdownCopied ? (
                           <>
-                            <svg className="w-3.5 h-3.5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            <svg
+                              className="w-3.5 h-3.5 text-success"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
                             </svg>
                             <span className="text-success">Copied!</span>
                           </>
                         ) : (
                           <>
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
                             </svg>
                             <span>Copy</span>
                           </>
