@@ -94,6 +94,7 @@ export default function URLBuilder() {
       gistId: "",
       layout: "normal",
       langsCount: "5",
+      cardWidth: "",
     },
     {
       id: "mc2",
@@ -103,6 +104,7 @@ export default function URLBuilder() {
       gistId: "",
       layout: "compact",
       langsCount: "8",
+      cardWidth: "",
     },
   ]);
   /** Shared height (px) applied to all <img> tags in the README snippet */
@@ -134,6 +136,7 @@ export default function URLBuilder() {
         gistId: "",
         layout: "normal",
         langsCount: "5",
+        cardWidth: "",
       },
     ]);
   };
@@ -300,6 +303,8 @@ export default function URLBuilder() {
         gradientColor1,
         gradientColor2,
         origin,
+        borderRadius,
+        hideBorder,
       ),
     )
     .filter(Boolean);
@@ -441,6 +446,10 @@ export default function URLBuilder() {
                     onRemoveCard={removeMultiCard}
                     onUpdateCard={updateMultiCard}
                     onCardHeightChange={setMultiCardHeight}
+                    borderRadius={borderRadius}
+                    hideBorder={hideBorder}
+                    onBorderRadiusChange={setBorderRadius}
+                    onHideBorderChange={setHideBorder}
                   />
                 )}
               </div>

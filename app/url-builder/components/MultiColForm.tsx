@@ -10,6 +10,11 @@ interface MultiColFormProps {
   onRemoveCard: (id: string) => void;
   onUpdateCard: (id: string, updates: Partial<MultiCard>) => void;
   onCardHeightChange: (value: string) => void;
+  // Advanced settings
+  borderRadius: string;
+  hideBorder: boolean;
+  onBorderRadiusChange: (value: string) => void;
+  onHideBorderChange: (value: boolean) => void;
 }
 
 export function MultiColForm({
@@ -20,6 +25,10 @@ export function MultiColForm({
   onRemoveCard,
   onUpdateCard,
   onCardHeightChange,
+  borderRadius,
+  hideBorder,
+  onBorderRadiusChange,
+  onHideBorderChange,
 }: MultiColFormProps) {
   return (
     <div className="space-y-4 animate-fade-in-up animate-delay-200">
@@ -71,6 +80,34 @@ export function MultiColForm({
           Fill in the global GitHub username above and any required fields for each card to generate a preview.
         </p>
       )}
+
+      {/* Advanced Settings for Multi-Col */}
+      <div className="pt-4 border-t border-card-border/30">
+        <span className="text-sm font-semibold text-text">Advanced Settings</span>
+        <p className="text-xs text-text-muted mb-3">Applied to all cards</p>
+        <div className="space-y-3">
+          <FormGroup label="Border Radius" description="Corner rounding (0-30)">
+            <input
+              type="number"
+              value={borderRadius}
+              min="0"
+              max="30"
+              step="0.5"
+              onChange={(e) => onBorderRadiusChange(e.target.value)}
+              className="font-mono"
+            />
+          </FormGroup>
+          <label className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              checked={hideBorder}
+              onChange={(e) => onHideBorderChange(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm text-text-secondary">Hide Border</span>
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

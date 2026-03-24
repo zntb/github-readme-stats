@@ -14,6 +14,8 @@ export function buildSingleCardUrl(
   gradientColor1: string,
   gradientColor2: string,
   origin: string,
+  globalBorderRadius?: string,
+  globalHideBorder?: boolean,
 ): string {
   const params = new URLSearchParams();
 
@@ -79,6 +81,21 @@ export function buildSingleCardUrl(
     endpoint = "/api/wakatime";
     params.set("username", username);
     if (card.layout && card.layout !== "normal") params.set("layout", card.layout);
+  }
+
+  // Card width (per-card)
+  if (card.cardWidth) {
+    params.set("card_width", card.cardWidth);
+  }
+
+  // Border radius (global)
+  if (globalBorderRadius && globalBorderRadius !== "4.5") {
+    params.set("border_radius", globalBorderRadius);
+  }
+
+  // Hide border (global)
+  if (globalHideBorder) {
+    params.set("hide_border", "true");
   }
 
   return `${origin}${endpoint}?${params.toString()}`;
