@@ -55,8 +55,8 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
         </select>
       </div>
 
-      {/* Username field for wakatime only */}
-      {card.type === "wakatime" && (
+      {/* Username field — always shown except for gist; for wakatime uses its own label */}
+      {card.type !== "gist" && (
         <div>
           <label className="text-xs text-text-muted block mb-1">{usernameLabel}</label>
           <input
@@ -66,6 +66,11 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
             onChange={(e) => onUpdate({ username: e.target.value })}
             className="font-mono text-sm"
           />
+          {card.type !== "wakatime" && (
+            <p className="text-xs text-text-muted mt-1">
+              Leave blank to use the global GitHub username above.
+            </p>
+          )}
         </div>
       )}
 
@@ -138,19 +143,6 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
           )}
         </div>
       )}
-
-      {/* Height per card */}
-      <div>
-        <label className="text-xs text-text-muted block mb-1">Height (px)</label>
-        <input
-          type="number"
-          min="100"
-          max="500"
-          value={card.height}
-          onChange={(e) => onUpdate({ height: Number(e.target.value) })}
-          className="font-mono text-sm"
-        />
-      </div>
     </div>
   );
 }

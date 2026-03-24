@@ -95,7 +95,6 @@ export interface MultiCard {
   username: string;
   repo: string;
   gistId: string;
-  height: number;
   layout: string;
   langsCount: string;
 }
