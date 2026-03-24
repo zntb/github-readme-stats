@@ -3,7 +3,8 @@
 
 import { useState, useCallback } from "react";
 
-type CardType = "stats" | "pin" | "top-langs" | "streak" | "gist" | "wakatime";
+type SingleCardType = "stats" | "pin" | "top-langs" | "streak" | "gist" | "wakatime";
+type CardType = SingleCardType | "multi";
 
 const THEMES = [
   "default",
@@ -76,12 +77,112 @@ const GRADIENT_TEMPLATES = [
 
 const GRADIENT_THEMES = ["ambient_gradient"];
 
+const CARD_TYPE_LABELS: Record<SingleCardType, string> = {
+  stats: "Stats",
+  pin: "Repo Pin",
+  "top-langs": "Top Languages",
+  streak: "Streak",
+  gist: "Gist",
+  wakatime: "WakaTime",
+};
+
 interface ColorConfig {
   titleColor: string;
   iconColor: string;
   textColor: string;
   bgColor: string;
   borderColor: string;
+}
+
+interface MultiCard {
+  id: string;
+  type: SingleCardType;
+  username: string;
+  repo: string;
+  gistId: string;
+  height: number;
+  layout: string;
+  langsCount: string;
+}
+
+let multiCardCounter = 3;
+
+function buildSingleCardUrl(
+  card: MultiCard,
+  theme: string,
+  colors: ColorConfig,
+  gradientEnabled: boolean,
+  selectedGradient: string,
+  gradientAngle: number,
+  gradientColor1: string,
+  gradientColor2: string,
+  origin: string,
+): string {
+  const params = new URLSearchParams();
+
+  // Theme/color params
+  if (gradientEnabled && (selectedGradient || gradientColor1 || gradientColor2)) {
+    const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient);
+    const isTheme = GRADIENT_THEMES.includes(selectedGradient);
+    if (template) {
+      const templateColors = template.colors.map((c: string) => c.replace("#", ""));
+      params.set("bg_color", [template.angle, ...templateColors].join(","));
+    } else if (isTheme) {
+      params.set("theme", selectedGradient);
+    } else {
+      const c1 = gradientColor1.replace("#", "");
+      const c2 = gradientColor2.replace("#", "");
+      params.set("bg_color", [gradientAngle, c1, c2].join(","));
+    }
+    const hex = (c: string) => c.replace("#", "");
+    if (hex(colors.titleColor) !== "2f80ed") params.set("title_color", hex(colors.titleColor));
+    if (hex(colors.iconColor) !== "4c71f2") params.set("icon_color", hex(colors.iconColor));
+    if (hex(colors.textColor) !== "434d58") params.set("text_color", hex(colors.textColor));
+    if (hex(colors.borderColor) !== "e4e2e2") params.set("border_color", hex(colors.borderColor));
+  } else if (theme) {
+    params.set("theme", theme);
+  } else {
+    const hex = (c: string) => c.replace("#", "");
+    if (hex(colors.titleColor) !== "2f80ed") params.set("title_color", hex(colors.titleColor));
+    if (hex(colors.iconColor) !== "4c71f2") params.set("icon_color", hex(colors.iconColor));
+    if (hex(colors.textColor) !== "434d58") params.set("text_color", hex(colors.textColor));
+    if (hex(colors.bgColor) !== "fffefe") params.set("bg_color", hex(colors.bgColor));
+    if (hex(colors.borderColor) !== "e4e2e2") params.set("border_color", hex(colors.borderColor));
+  }
+
+  let endpoint = "/api";
+
+  if (card.type === "stats") {
+    if (!card.username) return "";
+    params.set("username", card.username);
+    params.set("show_icons", "true");
+  } else if (card.type === "pin") {
+    if (!card.username || !card.repo) return "";
+    endpoint = "/api/pin";
+    params.set("username", card.username);
+    params.set("repo", card.repo);
+  } else if (card.type === "top-langs") {
+    if (!card.username) return "";
+    endpoint = "/api/top-langs";
+    params.set("username", card.username);
+    if (card.layout && card.layout !== "normal") params.set("layout", card.layout);
+    if (card.langsCount && card.langsCount !== "5") params.set("langs_count", card.langsCount);
+  } else if (card.type === "streak") {
+    if (!card.username) return "";
+    endpoint = "/api/streak";
+    params.set("username", card.username);
+  } else if (card.type === "gist") {
+    if (!card.gistId) return "";
+    endpoint = "/api/gist";
+    params.set("id", card.gistId);
+  } else if (card.type === "wakatime") {
+    if (!card.username) return "";
+    endpoint = "/api/wakatime";
+    params.set("username", card.username);
+    if (card.layout && card.layout !== "normal") params.set("layout", card.layout);
+  }
+
+  return `${origin}${endpoint}?${params.toString()}`;
 }
 
 export default function URLBuilder() {
@@ -97,7 +198,6 @@ export default function URLBuilder() {
   const [advanced, setAdvanced] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markdownCopied, setMarkdownCopied] = useState(false);
-  const [mounted] = useState(true); // Always true on client - no hydration issue for this use case
 
   const [statsUsername, setStatsUsername] = useState("");
   const [statsTitle, setStatsTitle] = useState("");
@@ -132,52 +232,79 @@ export default function URLBuilder() {
   const [hideTitle, setHideTitle] = useState(false);
   const [disableAnimations, setDisableAnimations] = useState(false);
 
-  // Gradient background state
   const [gradientEnabled, setGradientEnabled] = useState(false);
   const [selectedGradient, setSelectedGradient] = useState("");
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientColor1, setGradientColor1] = useState("#ff6b6b");
   const [gradientColor2, setGradientColor2] = useState("#feca57");
 
+  // Multi-col state
+  const [multiCards, setMultiCards] = useState<MultiCard[]>([
+    {
+      id: "mc1",
+      type: "stats",
+      username: "",
+      repo: "",
+      gistId: "",
+      height: 200,
+      layout: "normal",
+      langsCount: "5",
+    },
+    {
+      id: "mc2",
+      type: "top-langs",
+      username: "",
+      repo: "",
+      gistId: "",
+      height: 200,
+      layout: "compact",
+      langsCount: "8",
+    },
+  ]);
+  const [multiCardWidth, setMultiCardWidth] = useState("400");
+  const [htmlCopied, setHtmlCopied] = useState(false);
+
+  const addMultiCard = () => {
+    const newId = `mc${multiCardCounter++}`;
+    setMultiCards((prev) => [
+      ...prev,
+      {
+        id: newId,
+        type: "stats",
+        username: "",
+        repo: "",
+        gistId: "",
+        height: 200,
+        layout: "normal",
+        langsCount: "5",
+      },
+    ]);
+  };
+
+  const removeMultiCard = (id: string) => {
+    setMultiCards((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const updateMultiCard = (id: string, updates: Partial<MultiCard>) => {
+    setMultiCards((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+  };
+
   const buildUrl = useCallback((): { url: string; valid: boolean } => {
     const params = new URLSearchParams();
 
-    // Handle gradient background
     if (gradientEnabled && (selectedGradient || gradientColor1 || gradientColor2)) {
-      // Check if a template is selected and user hasn't modified the colors
       const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient);
       const isTheme = GRADIENT_THEMES.includes(selectedGradient);
-
       if (template) {
-        // Template gradient - check if user has modified the angle or first two colors
-        // (only compare first 2 colors since UI only supports 2)
-        const templateFirstColor = template.colors[0];
-        const templateSecondColor = template.colors[1] || template.colors[0];
-        const userHasModifiedColors =
-          gradientAngle !== template.angle ||
-          gradientColor1 !== templateFirstColor ||
-          gradientColor2 !== templateSecondColor;
-
-        if (!userHasModifiedColors) {
-          // User hasn't modified - use template's full color list (supports 3+ colors)
-          const templateColors = template.colors.map((c: string) => c.replace("#", ""));
-          params.set("bg_color", [template.angle, ...templateColors].join(","));
-        } else {
-          // User has modified - use their custom values
-          const c1 = gradientColor1.replace("#", "");
-          const c2 = gradientColor2.replace("#", "");
-          params.set("bg_color", [gradientAngle, c1, c2].join(","));
-        }
+        const templateColors = template.colors.map((c: string) => c.replace("#", ""));
+        params.set("bg_color", [template.angle, ...templateColors].join(","));
       } else if (isTheme) {
-        // Theme name (like ambient_gradient)
         params.set("theme", selectedGradient);
       } else {
-        // Custom gradient colors from color pickers (only if not default or if explicitly set)
         const c1 = gradientColor1.replace("#", "");
         const c2 = gradientColor2.replace("#", "");
         params.set("bg_color", [gradientAngle, c1, c2].join(","));
       }
-      // Allow color customization with gradient background
       const hex = (c: string) => c.replace("#", "");
       if (hex(colors.titleColor) !== "2f80ed") params.set("title_color", hex(colors.titleColor));
       if (hex(colors.iconColor) !== "4c71f2") params.set("icon_color", hex(colors.iconColor));
@@ -253,10 +380,16 @@ export default function URLBuilder() {
         if (wakaTitle) params.set("custom_title", wakaTitle);
         if (wakaLayout !== "normal") params.set("layout", wakaLayout);
       }
+    } else if (cardType === "multi") {
+      valid = multiCards.some((c) => {
+        if (c.type === "pin") return c.username && c.repo;
+        if (c.type === "gist") return !!c.gistId;
+        return !!c.username;
+      });
     }
 
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-    const url = valid ? `${baseUrl}${endpoint}?${params.toString()}` : "";
+    const url = valid && cardType !== "multi" ? `${baseUrl}${endpoint}?${params.toString()}` : "";
     return { url, valid };
   }, [
     cardType,
@@ -293,9 +426,44 @@ export default function URLBuilder() {
     wakaUsername,
     wakaTitle,
     wakaLayout,
+    multiCards,
   ]);
 
   const { url, valid } = buildUrl();
+
+  // Build multi-col URLs
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const multiUrls = multiCards
+    .map((card) =>
+      buildSingleCardUrl(
+        card,
+        theme,
+        colors,
+        gradientEnabled,
+        selectedGradient,
+        gradientAngle,
+        gradientColor1,
+        gradientColor2,
+        origin,
+      ),
+    )
+    .filter(Boolean);
+
+  const multiValid = cardType === "multi" && multiUrls.length > 0;
+
+  // Generate HTML for multi-col — use per-card height for the output img tag
+  const multiHtml = multiValid
+    ? multiUrls
+        .map((u, i) => {
+          const h = multiCards[i]?.height ?? Number(multiCardWidth) ?? 200;
+          return `  <img height="${h}" src="${u}" alt="GitHub Card" />`;
+        })
+        .join("\n")
+    : "";
+
+  const multiHtmlSnippet = multiValid
+    ? `<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;">\n${multiHtml}\n</div>`
+    : "";
 
   const copyUrl = async () => {
     if (valid && url) {
@@ -314,6 +482,14 @@ export default function URLBuilder() {
     }
   };
 
+  const copyHtml = async () => {
+    if (multiValid && multiHtmlSnippet) {
+      await navigator.clipboard.writeText(multiHtmlSnippet);
+      setHtmlCopied(true);
+      setTimeout(() => setHtmlCopied(false), 2000);
+    }
+  };
+
   const tabs: { id: CardType; label: string; icon: string }[] = [
     { id: "stats", label: "Stats", icon: "📊" },
     { id: "pin", label: "Pin", icon: "📌" },
@@ -321,6 +497,7 @@ export default function URLBuilder() {
     { id: "streak", label: "Streak", icon: "🔥" },
     { id: "gist", label: "Gist", icon: "📝" },
     { id: "wakatime", label: "Wakatime", icon: "⏱️" },
+    { id: "multi", label: "Multi-Col", icon: "🗂️" },
   ];
 
   return (
@@ -352,14 +529,14 @@ export default function URLBuilder() {
                 Card Type
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setCardType(tab.id)}
                     className={`
-                      relative px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
-                      flex items-center justify-center gap-2 group
+                      relative px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                      flex items-center justify-center gap-1.5 group
                       ${
                         cardType === tab.id
                           ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 scale-[1.02]"
@@ -367,7 +544,7 @@ export default function URLBuilder() {
                       }
                     `}
                   >
-                    <span className="text-lg">{tab.icon}</span>
+                    <span className="text-base">{tab.icon}</span>
                     <span>{tab.label}</span>
                     {cardType === tab.id && (
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 animate-pulse" />
@@ -377,6 +554,7 @@ export default function URLBuilder() {
               </div>
 
               <div className="space-y-6">
+                {/* ── STATS ── */}
                 {cardType === "stats" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="Enter your GitHub username">
@@ -441,6 +619,7 @@ export default function URLBuilder() {
                   </div>
                 )}
 
+                {/* ── PIN ── */}
                 {cardType === "pin" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="Repository owner">
@@ -481,6 +660,7 @@ export default function URLBuilder() {
                   </div>
                 )}
 
+                {/* ── TOP LANGS ── */}
                 {cardType === "top-langs" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup
@@ -530,6 +710,7 @@ export default function URLBuilder() {
                   </div>
                 )}
 
+                {/* ── STREAK ── */}
                 {cardType === "streak" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="GitHub Username *" description="User whose streak to show">
@@ -552,6 +733,7 @@ export default function URLBuilder() {
                   </div>
                 )}
 
+                {/* ── GIST ── */}
                 {cardType === "gist" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
                     <FormGroup label="Gist ID *" description="The Gist identifier">
@@ -575,9 +757,13 @@ export default function URLBuilder() {
                   </div>
                 )}
 
+                {/* ── WAKATIME ── */}
                 {cardType === "wakatime" && (
                   <div className="space-y-5 animate-fade-in-up animate-delay-200">
-                    <FormGroup label="Wakatime Username *" description="Your Wakatime username">
+                    <FormGroup
+                      label="WakaTime Username *"
+                      description="Your public WakaTime username"
+                    >
                       <input
                         type="text"
                         placeholder="e.g., octocat"
@@ -602,14 +788,85 @@ export default function URLBuilder() {
                     </FormGroup>
                   </div>
                 )}
+
+                {/* ── MULTI-COL ── */}
+                {cardType === "multi" && (
+                  <div className="space-y-4 animate-fade-in-up animate-delay-200">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-text-secondary">
+                        Configure multiple cards to display side by side. They share the global
+                        theme/colors.
+                      </p>
+                    </div>
+
+                    <FormGroup
+                      label="README img height (px)"
+                      description="Height applied to <img> tags in the HTML snippet for README alignment. Does not affect the live preview above."
+                    >
+                      <input
+                        type="number"
+                        value={multiCardWidth}
+                        min="100"
+                        max="500"
+                        placeholder="200"
+                        onChange={(e) => setMultiCardWidth(e.target.value)}
+                        className="font-mono"
+                      />
+                    </FormGroup>
+
+                    <div className="space-y-3">
+                      {multiCards.map((card, idx) => (
+                        <MultiCardRow
+                          key={card.id}
+                          card={card}
+                          index={idx}
+                          onUpdate={(updates) => updateMultiCard(card.id, updates)}
+                          onRemove={() => removeMultiCard(card.id)}
+                          canRemove={multiCards.length > 1}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={addMultiCard}
+                      className="w-full py-2.5 rounded-xl border-2 border-dashed border-card-border text-text-muted hover:border-primary/50 hover:text-primary transition-all text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      Add Card
+                    </button>
+
+                    {multiCards.length > 0 && multiUrls.length === 0 && (
+                      <p className="text-xs text-warning text-center pt-1">
+                        Fill in required fields (username/id) for each card to generate a preview.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </section>
 
-            {/* Appearance Panel */}
+            {/* Appearance Panel — hidden for multi since theme is shared */}
             <section className="glass-card animate-fade-in-up animate-delay-300">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-accent to-primary rounded-full" />
                 Appearance
+                {cardType === "multi" && (
+                  <span className="text-xs font-normal text-text-muted ml-2">
+                    (applied to all cards)
+                  </span>
+                )}
               </h2>
 
               <div className="space-y-6">
@@ -648,7 +905,6 @@ export default function URLBuilder() {
 
                   {gradientEnabled && (
                     <div className="space-y-4 mt-4 animate-fade-in-up">
-                      {/* Gradient Template Selection */}
                       <FormGroup
                         label="Gradient Templates"
                         description="Choose a preset gradient or enter custom colors"
@@ -658,12 +914,10 @@ export default function URLBuilder() {
                           onChange={(e) => {
                             const selectedId = e.target.value;
                             setSelectedGradient(selectedId);
-                            // Sync custom color inputs with template when selected
                             const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedId);
                             if (template) {
                               setGradientAngle(template.angle);
                               setGradientColor1(template.colors[0]);
-                              // Use second color if available, otherwise repeat first
                               setGradientColor2(template.colors[1] || template.colors[0]);
                             }
                           }}
@@ -683,52 +937,38 @@ export default function URLBuilder() {
                         </select>
                       </FormGroup>
 
-                      {/* Custom Gradient Colors with Color Pickers */}
                       <div className="space-y-3">
                         <span className="text-sm font-medium text-text-secondary">
                           Custom Colors
                         </span>
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-xs text-text-secondary">Color 1</label>
-                            <div className="flex gap-2 items-center">
-                              <input
-                                type="color"
-                                value={gradientColor1}
-                                onChange={(e) => setGradientColor1(e.target.value)}
-                                className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
-                              />
-                              <input
-                                type="text"
-                                value={gradientColor1}
-                                onChange={(e) => {
-                                  const v = e.target.value;
-                                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setGradientColor1(v);
-                                }}
-                                className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-2 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                              />
+                          {(
+                            [
+                              ["Color 1", gradientColor1, setGradientColor1],
+                              ["Color 2", gradientColor2, setGradientColor2],
+                            ] as [string, string, (v: string) => void][]
+                          ).map(([label, val, setter]) => (
+                            <div key={label} className="space-y-2">
+                              <label className="text-xs text-text-secondary">{label}</label>
+                              <div className="flex gap-2 items-center">
+                                <input
+                                  type="color"
+                                  value={val}
+                                  onChange={(e) => setter(e.target.value)}
+                                  className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
+                                />
+                                <input
+                                  type="text"
+                                  value={val}
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setter(v);
+                                  }}
+                                  className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-2 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-xs text-text-secondary">Color 2</label>
-                            <div className="flex gap-2 items-center">
-                              <input
-                                type="color"
-                                value={gradientColor2}
-                                onChange={(e) => setGradientColor2(e.target.value)}
-                                className="w-10 h-10 rounded-lg border-2 border-card-border cursor-pointer hover:border-primary transition-colors"
-                              />
-                              <input
-                                type="text"
-                                value={gradientColor2}
-                                onChange={(e) => {
-                                  const v = e.target.value;
-                                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setGradientColor2(v);
-                                }}
-                                className="flex-1 font-mono text-sm bg-bg-secondary border border-card-border rounded-lg px-2 py-2 focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                              />
-                            </div>
-                          </div>
+                          ))}
                         </div>
                         <div className="space-y-2">
                           <label className="text-xs text-text-secondary">
@@ -746,10 +986,8 @@ export default function URLBuilder() {
                         </div>
                       </div>
 
-                      {/* Preview of selected gradient */}
                       {(gradientColor1 ||
                         gradientColor2 ||
-                        selectedGradient ||
                         GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient)) && (
                         <div className="space-y-2">
                           <span className="text-sm font-medium text-text-secondary">Preview</span>
@@ -760,14 +998,11 @@ export default function URLBuilder() {
                                 const template = GRADIENT_TEMPLATES.find(
                                   (g) => g.id === selectedGradient,
                                 );
-                                if (template) {
+                                if (template)
                                   return `linear-gradient(${template.angle}deg, ${template.colors.join(", ")})`;
-                                } else if (GRADIENT_THEMES.includes(selectedGradient)) {
-                                  // Show ambient gradient for themes
+                                if (GRADIENT_THEMES.includes(selectedGradient))
                                   return "linear-gradient(135deg, #23a58d, #c850c0, #ffcc70)";
-                                } else {
-                                  return `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
-                                }
+                                return `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
                               })(),
                             }}
                           />
@@ -816,93 +1051,97 @@ export default function URLBuilder() {
                   </div>
                 )}
 
-                <button
-                  className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors group mt-4"
-                  onClick={() => setAdvanced(!advanced)}
-                >
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-300 ${advanced ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                  Advanced Options
-                </button>
+                {cardType !== "multi" && (
+                  <>
+                    <button
+                      className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors group mt-4"
+                      onClick={() => setAdvanced(!advanced)}
+                    >
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-300 ${advanced ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                      Advanced Options
+                    </button>
 
-                {advanced && (
-                  <div className="space-y-5 pt-4 border-t border-card-border animate-fade-in-up">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <FormGroup label="Border Radius" description="Corner rounding (0-30)">
-                        <input
-                          type="number"
-                          value={borderRadius}
-                          min="0"
-                          max="30"
-                          step="0.5"
-                          onChange={(e) => setBorderRadius(e.target.value)}
-                          className="font-mono"
-                        />
-                      </FormGroup>
-                      <FormGroup label="Card Width" description="Fixed width in pixels">
-                        <input
-                          type="number"
-                          placeholder="e.g., 500"
-                          value={cardWidth}
-                          onChange={(e) => setCardWidth(e.target.value)}
-                          className="font-mono"
-                        />
-                      </FormGroup>
-                      <FormGroup label="Cache (seconds)" description="Cache duration">
-                        <input
-                          type="number"
-                          placeholder="e.g., 86400"
-                          value={cacheSeconds}
-                          onChange={(e) => setCacheSeconds(e.target.value)}
-                          className="font-mono"
-                        />
-                      </FormGroup>
-                      <FormGroup label="Locale" description="Language code">
-                        <input
-                          type="text"
-                          placeholder="e.g., en, cn, de"
-                          value={locale}
-                          onChange={(e) => setLocale(e.target.value)}
-                          className="font-mono"
-                        />
-                      </FormGroup>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      {[
-                        { label: "Hide Border", val: hideBorder, set: setHideBorder },
-                        { label: "Hide Title", val: hideTitle, set: setHideTitle },
-                        {
-                          label: "Disable Animations",
-                          val: disableAnimations,
-                          set: setDisableAnimations,
-                        },
-                      ].map(({ label, val, set }) => (
-                        <label
-                          key={label}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={val}
-                            onChange={(e) => set(e.target.checked)}
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm text-text-secondary">{label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                    {advanced && (
+                      <div className="space-y-5 pt-4 border-t border-card-border animate-fade-in-up">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <FormGroup label="Border Radius" description="Corner rounding (0-30)">
+                            <input
+                              type="number"
+                              value={borderRadius}
+                              min="0"
+                              max="30"
+                              step="0.5"
+                              onChange={(e) => setBorderRadius(e.target.value)}
+                              className="font-mono"
+                            />
+                          </FormGroup>
+                          <FormGroup label="Card Width" description="Fixed width in pixels">
+                            <input
+                              type="number"
+                              placeholder="e.g., 500"
+                              value={cardWidth}
+                              onChange={(e) => setCardWidth(e.target.value)}
+                              className="font-mono"
+                            />
+                          </FormGroup>
+                          <FormGroup label="Cache (seconds)" description="Cache duration">
+                            <input
+                              type="number"
+                              placeholder="e.g., 86400"
+                              value={cacheSeconds}
+                              onChange={(e) => setCacheSeconds(e.target.value)}
+                              className="font-mono"
+                            />
+                          </FormGroup>
+                          <FormGroup label="Locale" description="Language code">
+                            <input
+                              type="text"
+                              placeholder="e.g., en, cn, de"
+                              value={locale}
+                              onChange={(e) => setLocale(e.target.value)}
+                              className="font-mono"
+                            />
+                          </FormGroup>
+                        </div>
+                        <div className="flex flex-wrap gap-4">
+                          {[
+                            { label: "Hide Border", val: hideBorder, set: setHideBorder },
+                            { label: "Hide Title", val: hideTitle, set: setHideTitle },
+                            {
+                              label: "Disable Animations",
+                              val: disableAnimations,
+                              set: setDisableAnimations,
+                            },
+                          ].map(({ label, val, set }) => (
+                            <label
+                              key={label}
+                              className="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary border border-card-border hover:border-primary/50 transition-colors cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={val}
+                                onChange={(e) => set(e.target.checked)}
+                                className="w-4 h-4"
+                              />
+                              <span className="text-sm text-text-secondary">{label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </section>
@@ -915,12 +1154,57 @@ export default function URLBuilder() {
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <span className="w-1 h-6 bg-gradient-to-b from-success to-accent rounded-full" />
                   Live Preview
+                  {cardType === "multi" && (
+                    <span className="text-xs font-normal text-text-muted ml-2">(side-by-side)</span>
+                  )}
                 </h2>
 
                 <div className="relative rounded-xl overflow-hidden mb-6 bg-bg-secondary border border-card-border shadow-lg">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 pointer-events-none" />
-                  <div className="relative flex items-center justify-center min-h-[280px] p-6">
-                    {mounted && valid && url ? (
+                  <div className="relative flex items-center justify-center min-h-[200px] p-6">
+                    {/* Multi-col preview — render each SVG at its natural intrinsic size */}
+                    {cardType === "multi" ? (
+                      multiUrls.length > 0 ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            flexWrap: "nowrap",
+                            gap: "12px",
+                            overflowX: "auto",
+                            alignItems: "flex-start",
+                            width: "100%",
+                          }}
+                        >
+                          {multiUrls.map((u, i) => (
+                            <img
+                              key={u + i}
+                              src={u}
+                              alt={`Card ${i + 1}`}
+                              style={{
+                                display: "block",
+                                height: "auto",
+                                width: "auto",
+                                flexShrink: 0,
+                                borderRadius: "8px",
+                                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+                              }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center p-8">
+                          <div className="text-5xl mb-4 opacity-30">🗂️</div>
+                          <p className="text-text-muted text-sm">
+                            Fill in usernames for each card to see the multi-column preview
+                          </p>
+                        </div>
+                      )
+                    ) : /* Single card preview */
+                    valid && url ? (
                       <img
                         key={url}
                         src={url}
@@ -936,98 +1220,156 @@ export default function URLBuilder() {
                       <div className="text-center p-8">
                         <div className="text-5xl mb-4 opacity-30">🎨</div>
                         <p className="text-text-muted text-sm">
-                          {mounted ? "Configure your card to see the preview" : "Loading..."}
+                          Configure your card to see the preview
                         </p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-text">Generated URL</label>
-                  <div className="rounded-xl p-4 text-sm font-mono bg-bg-secondary border border-card-border shadow-inner overflow-x-auto leading-relaxed">
-                    <span className={valid ? "text-text" : "text-text-muted"}>
-                      {url || "Enter a username to generate URL"}
-                    </span>
-                  </div>
+                {/* Single card output */}
+                {cardType !== "multi" && (
+                  <div className="space-y-3">
+                    <label className="block text-sm font-semibold text-text">Generated URL</label>
+                    <div className="rounded-xl p-4 text-sm font-mono bg-bg-secondary border border-card-border shadow-inner overflow-x-auto leading-relaxed">
+                      <span className={valid ? "text-text" : "text-text-muted"}>
+                        {url || "Enter a username to generate URL"}
+                      </span>
+                    </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button
-                      onClick={copyUrl}
-                      disabled={!valid}
-                      className={`flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${valid ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]" : "bg-bg-tertiary text-text-muted cursor-not-allowed"}`}
-                    >
-                      {copied ? (
-                        <>
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                            />
-                          </svg>
-                          Copy URL
-                        </>
-                      )}
-                    </button>
-                    {valid && url && (
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-center transition-all duration-300 bg-bg-tertiary border border-card-border text-text hover:border-primary/50 hover:bg-bg-secondary flex items-center justify-center gap-2 group"
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <button
+                        onClick={copyUrl}
+                        disabled={!valid}
+                        className={`flex-1 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${valid ? "bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]" : "bg-bg-tertiary text-text-muted cursor-not-allowed"}`}
                       >
-                        <span>Open Card</span>
-                        <svg
-                          className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        {copied ? (
+                          <>
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Copy URL
+                          </>
+                        )}
+                      </button>
+                      {valid && url && (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 px-6 py-3 rounded-xl font-semibold text-sm text-center transition-all duration-300 bg-bg-tertiary border border-card-border text-text hover:border-primary/50 hover:bg-bg-secondary flex items-center justify-center gap-2 group"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </a>
+                          <span>Open Card</span>
+                          <svg
+                            className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+
+                    {valid && url && (
+                      <div className="mt-6 animate-fade-in-up">
+                        <div className="flex items-center justify-between mb-3">
+                          <label className="text-sm font-semibold text-text">
+                            Markdown Snippet
+                          </label>
+                          <button
+                            onClick={copyMarkdown}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary border border-card-border text-text-secondary hover:text-text hover:border-primary/50 transition-all"
+                          >
+                            {markdownCopied ? (
+                              <>
+                                <svg
+                                  className="w-3.5 h-3.5 text-success"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                <span className="text-success">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner">
+                          <code className="text-text-secondary font-mono">{`![GitHub Stats](${url})`}</code>
+                        </pre>
+                      </div>
                     )}
                   </div>
-                </div>
+                )}
 
-                {valid && url && (
-                  <div className="mt-6 animate-fade-in-up">
-                    <div className="flex items-center justify-between mb-3">
-                      <label className="text-sm font-semibold text-text">Markdown Snippet</label>
+                {/* Multi-col HTML output */}
+                {cardType === "multi" && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold text-text">HTML Snippet</label>
                       <button
-                        onClick={copyMarkdown}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-bg-tertiary border border-card-border text-text-secondary hover:text-text hover:border-primary/50 transition-all"
+                        onClick={copyHtml}
+                        disabled={!multiValid}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${multiValid ? "bg-bg-tertiary border-card-border text-text-secondary hover:text-text hover:border-primary/50" : "bg-bg-tertiary border-card-border text-text-muted cursor-not-allowed"}`}
                       >
-                        {markdownCopied ? (
+                        {htmlCopied ? (
                           <>
                             <svg
                               className="w-3.5 h-3.5 text-success"
@@ -1059,14 +1401,24 @@ export default function URLBuilder() {
                                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                               />
                             </svg>
-                            <span>Copy</span>
+                            <span>Copy HTML</span>
                           </>
                         )}
                       </button>
                     </div>
-                    <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner">
-                      <code className="text-text-secondary font-mono">{`![GitHub Stats](${url})`}</code>
+                    <pre className="rounded-xl p-4 text-xs overflow-x-auto bg-bg-secondary border border-card-border shadow-inner min-h-[80px]">
+                      <code className="text-text-secondary font-mono whitespace-pre-wrap break-all">
+                        {multiValid
+                          ? multiHtmlSnippet
+                          : "Fill in card details above to generate HTML"}
+                      </code>
                     </pre>
+                    {multiValid && (
+                      <p className="text-xs text-text-muted">
+                        Paste this HTML into your README.md. GitHub renders inline HTML for
+                        side-by-side layout.
+                      </p>
+                    )}
                   </div>
                 )}
               </section>
@@ -1090,10 +1442,14 @@ export default function URLBuilder() {
                     <span className="text-success mt-0.5">•</span>
                     <span>Cards are cached by default for 24 hours</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>All parameters are optional except required fields</span>
-                  </li>
+                  {cardType === "multi" && (
+                    <li className="flex items-start gap-2">
+                      <span className="text-warning mt-0.5">•</span>
+                      <span>
+                        Multi-col uses HTML — GitHub Markdown renders it correctly in READMEs
+                      </span>
+                    </li>
+                  )}
                 </ul>
               </section>
             </div>
@@ -1107,6 +1463,8 @@ export default function URLBuilder() {
     </div>
   );
 }
+
+// ── Sub-components ──────────────────────────────────────────────
 
 function FormGroup({
   label,
@@ -1122,6 +1480,165 @@ function FormGroup({
       <label className="text-sm font-semibold text-text flex items-center gap-2">{label}</label>
       {description && <p className="text-xs text-text-muted">{description}</p>}
       <div className="pt-1">{children}</div>
+    </div>
+  );
+}
+
+function MultiCardRow({
+  card,
+  index,
+  onUpdate,
+  onRemove,
+  canRemove,
+}: {
+  card: MultiCard;
+  index: number;
+  onUpdate: (updates: Partial<MultiCard>) => void;
+  onRemove: () => void;
+  canRemove: boolean;
+}) {
+  const needsRepo = card.type === "pin";
+  const needsGistId = card.type === "gist";
+  const hasLayout = card.type === "top-langs" || card.type === "wakatime";
+  const usernameLabel = card.type === "wakatime" ? "WakaTime Username *" : "GitHub Username *";
+  const usernamePlaceholder = card.type === "wakatime" ? "WakaTime user" : "GitHub user";
+
+  return (
+    <div className="rounded-xl border border-card-border bg-bg-tertiary/40 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-text">Card {index + 1}</span>
+        {canRemove && (
+          <button
+            onClick={onRemove}
+            className="p-1.5 rounded-lg text-text-muted hover:text-error hover:bg-error/10 transition-all"
+            title="Remove card"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {/* Card type selector */}
+      <div>
+        <label className="text-xs text-text-muted block mb-1">Card Type</label>
+        <select
+          value={card.type}
+          onChange={(e) =>
+            onUpdate({ type: e.target.value as SingleCardType, repo: "", gistId: "" })
+          }
+          className="font-mono text-sm"
+        >
+          {(Object.keys(CARD_TYPE_LABELS) as SingleCardType[]).map((t) => (
+            <option key={t} value={t}>
+              {CARD_TYPE_LABELS[t]}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Username field (not for gist) */}
+      {!needsGistId && (
+        <div>
+          <label className="text-xs text-text-muted block mb-1">{usernameLabel}</label>
+          <input
+            type="text"
+            placeholder={usernamePlaceholder}
+            value={card.username}
+            onChange={(e) => onUpdate({ username: e.target.value })}
+            className="font-mono text-sm"
+          />
+        </div>
+      )}
+
+      {/* Repo field for pin */}
+      {needsRepo && (
+        <div>
+          <label className="text-xs text-text-muted block mb-1">Repository *</label>
+          <input
+            type="text"
+            placeholder="repo-name"
+            value={card.repo}
+            onChange={(e) => onUpdate({ repo: e.target.value })}
+            className="font-mono text-sm"
+          />
+        </div>
+      )}
+
+      {/* Gist ID */}
+      {needsGistId && (
+        <div>
+          <label className="text-xs text-text-muted block mb-1">Gist ID *</label>
+          <input
+            type="text"
+            placeholder="e.g., bbfce31e..."
+            value={card.gistId}
+            onChange={(e) => onUpdate({ gistId: e.target.value })}
+            className="font-mono text-sm"
+          />
+        </div>
+      )}
+
+      {/* Layout for top-langs and wakatime */}
+      {hasLayout && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-text-muted block mb-1">Layout</label>
+            <select
+              value={card.layout}
+              onChange={(e) => onUpdate({ layout: e.target.value })}
+              className="text-sm"
+            >
+              {card.type === "top-langs" ? (
+                <>
+                  <option value="normal">Normal</option>
+                  <option value="compact">Compact</option>
+                  <option value="donut">Donut</option>
+                  <option value="donut-vertical">Donut Vertical</option>
+                  <option value="pie">Pie</option>
+                </>
+              ) : (
+                <>
+                  <option value="normal">Normal</option>
+                  <option value="compact">Compact</option>
+                </>
+              )}
+            </select>
+          </div>
+          {card.type === "top-langs" && (
+            <div>
+              <label className="text-xs text-text-muted block mb-1">Lang Count</label>
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={card.langsCount}
+                onChange={(e) => onUpdate({ langsCount: e.target.value })}
+                className="font-mono text-sm"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Height per card */}
+      <div>
+        <label className="text-xs text-text-muted block mb-1">Height (px)</label>
+        <input
+          type="number"
+          min="100"
+          max="500"
+          value={card.height}
+          onChange={(e) => onUpdate({ height: Number(e.target.value) })}
+          className="font-mono text-sm"
+        />
+      </div>
     </div>
   );
 }
