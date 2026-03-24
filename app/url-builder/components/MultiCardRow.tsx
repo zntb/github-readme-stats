@@ -55,8 +55,8 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
         </select>
       </div>
 
-      {/* Username field (not for gist) */}
-      {!needsGistId && (
+      {/* Username field for wakatime only */}
+      {card.type === "wakatime" && (
         <div>
           <label className="text-xs text-text-muted block mb-1">{usernameLabel}</label>
           <input

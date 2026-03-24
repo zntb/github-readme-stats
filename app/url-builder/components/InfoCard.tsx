@@ -12,7 +12,8 @@ export function InfoCard({ cardType }: InfoCardProps) {
         <li className="flex items-start gap-2">
           <span className="text-primary mt-0.5">•</span>
           <span>
-            Use a <strong className="text-text">GitHub Personal Access Token</strong> for higher rate limits
+            Use a <strong className="text-text">GitHub Personal Access Token</strong> for higher
+            rate limits
           </span>
         </li>
         <li className="flex items-start gap-2">
@@ -26,9 +27,7 @@ export function InfoCard({ cardType }: InfoCardProps) {
         {cardType === "multi" && (
           <li className="flex items-start gap-2">
             <span className="text-warning mt-0.5">•</span>
-            <span>
-              Multi-col uses HTML — GitHub Markdown renders it correctly in READMEs
-            </span>
+            <span>Multi-col uses HTML — GitHub Markdown renders it correctly in READMEs</span>
           </li>
         )}
       </ul>

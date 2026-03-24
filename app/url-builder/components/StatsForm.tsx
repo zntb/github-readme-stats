@@ -2,37 +2,24 @@ import { FormGroup } from "./FormGroup";
 import { STATS_OPTIONS } from "../types";
 
 interface StatsFormProps {
-  username: string;
   title: string;
   hide: string;
   show: string[];
-  onUsernameChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onHideChange: (value: string) => void;
   onShowChange: (value: string[]) => void;
 }
 
 export function StatsForm({
-  username,
   title,
   hide,
   show,
-  onUsernameChange,
   onTitleChange,
   onHideChange,
   onShowChange,
 }: StatsFormProps) {
   return (
     <div className="space-y-5 animate-fade-in-up animate-delay-200">
-      <FormGroup label="GitHub Username *" description="Enter your GitHub username">
-        <input
-          type="text"
-          placeholder="e.g., octocat"
-          value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
-          className="font-mono"
-        />
-      </FormGroup>
       <FormGroup label="Custom Title" description="Personalize your card title">
         <input
           type="text"

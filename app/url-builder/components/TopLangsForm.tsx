@@ -1,37 +1,24 @@
 import { FormGroup } from "./FormGroup";
 
 interface TopLangsFormProps {
-  username: string;
   title: string;
   layout: string;
   langsCount: string;
-  onUsernameChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onLayoutChange: (value: string) => void;
   onLangsCountChange: (value: string) => void;
 }
 
 export function TopLangsForm({
-  username,
   title,
   layout,
   langsCount,
-  onUsernameChange,
   onTitleChange,
   onLayoutChange,
   onLangsCountChange,
 }: TopLangsFormProps) {
   return (
     <div className="space-y-5 animate-fade-in-up animate-delay-200">
-      <FormGroup label="GitHub Username *" description="User whose languages to display">
-        <input
-          type="text"
-          placeholder="e.g., octocat"
-          value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
-          className="font-mono"
-        />
-      </FormGroup>
       <FormGroup label="Custom Title" description="Card title override">
         <input
           type="text"

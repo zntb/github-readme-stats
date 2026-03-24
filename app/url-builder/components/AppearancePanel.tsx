@@ -95,7 +95,11 @@ export function AppearancePanel({
 
       <div className="space-y-6">
         <FormGroup label="Theme" description="Choose a preset theme or customize colors">
-          <select value={theme} onChange={(e) => onThemeChange(e.target.value)} className="font-mono">
+          <select
+            value={theme}
+            onChange={(e) => onThemeChange(e.target.value)}
+            className="font-mono"
+          >
             <option value="">Custom Colors</option>
             {THEMES.map((t) => (
               <option key={t} value={t}>
@@ -190,7 +194,9 @@ export function AppearancePanel({
                 </div>
               </div>
 
-              {(gradientColor1 || gradientColor2 || GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient)) && (
+              {(gradientColor1 ||
+                gradientColor2 ||
+                GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient)) && (
                 <div className="space-y-2">
                   <span className="text-sm font-medium text-text-secondary">Preview</span>
                   <div
@@ -198,7 +204,8 @@ export function AppearancePanel({
                     style={{
                       background: (() => {
                         const template = GRADIENT_TEMPLATES.find((g) => g.id === selectedGradient);
-                        if (template) return `linear-gradient(${template.angle}deg, ${template.colors.join(", ")})`;
+                        if (template)
+                          return `linear-gradient(${template.angle}deg, ${template.colors.join(", ")})`;
                         if (GRADIENT_THEMES.includes(selectedGradient))
                           return "linear-gradient(135deg, #23a58d, #c850c0, #ffcc70)";
                         return `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
@@ -262,7 +269,12 @@ export function AppearancePanel({
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
               Advanced Options
             </button>
@@ -313,7 +325,11 @@ export function AppearancePanel({
                   {[
                     { label: "Hide Border", val: hideBorder, set: onHideBorderChange },
                     { label: "Hide Title", val: hideTitle, set: onHideTitleChange },
-                    { label: "Disable Animations", val: disableAnimations, set: onDisableAnimationsChange },
+                    {
+                      label: "Disable Animations",
+                      val: disableAnimations,
+                      set: onDisableAnimationsChange,
+                    },
                   ].map(({ label, val, set }) => (
                     <label
                       key={label}

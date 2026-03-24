@@ -1,15 +1,11 @@
-import {
-  MultiCard,
-  ColorConfig,
-  GRADIENT_TEMPLATES,
-  GRADIENT_THEMES,
-} from "./types";
+import { MultiCard, ColorConfig, GRADIENT_TEMPLATES, GRADIENT_THEMES } from "./types";
 
 /**
  * Build URL for a single card in multi-col mode
  */
 export function buildSingleCardUrl(
   card: MultiCard,
+  globalUsername: string,
   theme: string,
   colors: ColorConfig,
   gradientEnabled: boolean,
@@ -52,34 +48,36 @@ export function buildSingleCardUrl(
   }
 
   let endpoint = "/api";
+  // Use card's username for wakatime, otherwise use global username
+  const username = card.type === "wakatime" ? card.username : card.username || globalUsername;
 
   if (card.type === "stats") {
-    if (!card.username) return "";
-    params.set("username", card.username);
+    if (!username) return "";
+    params.set("username", username);
     params.set("show_icons", "true");
   } else if (card.type === "pin") {
-    if (!card.username || !card.repo) return "";
+    if (!username || !card.repo) return "";
     endpoint = "/api/pin";
-    params.set("username", card.username);
+    params.set("username", username);
     params.set("repo", card.repo);
   } else if (card.type === "top-langs") {
-    if (!card.username) return "";
+    if (!username) return "";
     endpoint = "/api/top-langs";
-    params.set("username", card.username);
+    params.set("username", username);
     if (card.layout && card.layout !== "normal") params.set("layout", card.layout);
     if (card.langsCount && card.langsCount !== "5") params.set("langs_count", card.langsCount);
   } else if (card.type === "streak") {
-    if (!card.username) return "";
+    if (!username) return "";
     endpoint = "/api/streak";
-    params.set("username", card.username);
+    params.set("username", username);
   } else if (card.type === "gist") {
     if (!card.gistId) return "";
     endpoint = "/api/gist";
     params.set("id", card.gistId);
   } else if (card.type === "wakatime") {
-    if (!card.username) return "";
+    if (!username) return "";
     endpoint = "/api/wakatime";
-    params.set("username", card.username);
+    params.set("username", username);
     if (card.layout && card.layout !== "normal") params.set("layout", card.layout);
   }
 
@@ -193,7 +191,8 @@ export function buildUrl(params: BuildUrlParams): { url: string; valid: boolean 
     if (hex(colors.titleColor) !== "2f80ed") urlParams.set("title_color", hex(colors.titleColor));
     if (hex(colors.iconColor) !== "4c71f2") urlParams.set("icon_color", hex(colors.iconColor));
     if (hex(colors.textColor) !== "434d58") urlParams.set("text_color", hex(colors.textColor));
-    if (hex(colors.borderColor) !== "e4e2e2") urlParams.set("border_color", hex(colors.borderColor));
+    if (hex(colors.borderColor) !== "e4e2e2")
+      urlParams.set("border_color", hex(colors.borderColor));
   } else if (theme) {
     urlParams.set("theme", theme);
   } else {
@@ -202,7 +201,8 @@ export function buildUrl(params: BuildUrlParams): { url: string; valid: boolean 
     if (hex(colors.iconColor) !== "4c71f2") urlParams.set("icon_color", hex(colors.iconColor));
     if (hex(colors.textColor) !== "434d58") urlParams.set("text_color", hex(colors.textColor));
     if (hex(colors.bgColor) !== "fffefe") urlParams.set("bg_color", hex(colors.bgColor));
-    if (hex(colors.borderColor) !== "e4e2e2") urlParams.set("border_color", hex(colors.borderColor));
+    if (hex(colors.borderColor) !== "e4e2e2")
+      urlParams.set("border_color", hex(colors.borderColor));
   }
 
   // Advanced options

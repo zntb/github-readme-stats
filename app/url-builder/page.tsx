@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import {
   CardType,
@@ -31,7 +30,10 @@ import {
 
 let multiCardCounter = 3;
 
+const STORAGE_KEY = "github-readme-stats-username";
+
 export default function URLBuilder() {
+  const [globalUsername, setGlobalUsername] = useState("");
   const [cardType, setCardType] = useState<CardType>("stats");
   const [theme, setTheme] = useState("");
   const [colors, setColors] = useState<ColorConfig>(DEFAULT_COLORS);
@@ -40,25 +42,21 @@ export default function URLBuilder() {
   const [markdownCopied, setMarkdownCopied] = useState(false);
 
   // Stats
-  const [statsUsername, setStatsUsername] = useState("");
   const [statsTitle, setStatsTitle] = useState("");
   const [statsHide, setStatsHide] = useState("");
   const [statsShow, setStatsShow] = useState<string[]>(["prs_merged", "prs_merged_percentage"]);
 
   // Pin
-  const [pinUsername, setPinUsername] = useState("");
   const [pinRepo, setPinRepo] = useState("");
   const [pinTitle, setPinTitle] = useState("");
   const [pinShowOwner, setPinShowOwner] = useState(false);
 
   // Top Langs
-  const [langsUsername, setLangsUsername] = useState("");
   const [langsTitle, setLangsTitle] = useState("");
   const [langsLayout, setLangsLayout] = useState("normal");
   const [langsCount, setLangsCount] = useState("5");
 
   // Streak
-  const [streakUsername, setStreakUsername] = useState("");
   const [streakTitle, setStreakTitle] = useState("");
 
   // Gist
@@ -111,6 +109,19 @@ export default function URLBuilder() {
   ]);
   const [multiCardWidth, setMultiCardWidth] = useState("400");
   const [htmlCopied, setHtmlCopied] = useState(false);
+
+  // Load global username from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      setGlobalUsername(stored);
+    }
+  }, []);
+
+  // Save global username to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, globalUsername);
+  }, [globalUsername]);
 
   const addMultiCard = () => {
     const newId = `mc${multiCardCounter++}`;
@@ -181,35 +192,35 @@ export default function URLBuilder() {
     let valid = false;
 
     if (cardType === "stats") {
-      if (statsUsername) {
-        params.set("username", statsUsername);
+      if (globalUsername) {
+        params.set("username", globalUsername);
         valid = true;
         if (statsTitle) params.set("custom_title", statsTitle);
         if (statsHide) params.set("hide", statsHide);
         if (statsShow.length > 0) params.set("show", statsShow.join(","));
       }
     } else if (cardType === "pin") {
-      if (pinUsername && pinRepo) {
+      if (globalUsername && pinRepo) {
         endpoint = "/api/pin";
-        params.set("username", pinUsername);
+        params.set("username", globalUsername);
         params.set("repo", pinRepo);
         valid = true;
         if (pinTitle) params.set("custom_title", pinTitle);
         if (pinShowOwner) params.set("show_owner", "true");
       }
     } else if (cardType === "top-langs") {
-      if (langsUsername) {
+      if (globalUsername) {
         endpoint = "/api/top-langs";
-        params.set("username", langsUsername);
+        params.set("username", globalUsername);
         valid = true;
         if (langsTitle) params.set("custom_title", langsTitle);
         if (langsLayout !== "normal") params.set("layout", langsLayout);
         if (langsCount !== "5") params.set("langs_count", langsCount);
       }
     } else if (cardType === "streak") {
-      if (streakUsername) {
+      if (globalUsername) {
         endpoint = "/api/streak";
-        params.set("username", streakUsername);
+        params.set("username", globalUsername);
         valid = true;
         if (streakTitle) params.set("custom_title", streakTitle);
       }
@@ -255,19 +266,16 @@ export default function URLBuilder() {
     hideBorder,
     hideTitle,
     disableAnimations,
-    statsUsername,
+    globalUsername,
     statsTitle,
     statsHide,
     statsShow,
-    pinUsername,
     pinRepo,
     pinTitle,
     pinShowOwner,
-    langsUsername,
     langsTitle,
     langsLayout,
     langsCount,
-    streakUsername,
     streakTitle,
     gistId,
     gistShowOwner,
@@ -285,6 +293,7 @@ export default function URLBuilder() {
     .map((card) =>
       buildSingleCardUrl(
         card,
+        globalUsername,
         theme,
         colors,
         gradientEnabled,
@@ -343,15 +352,30 @@ export default function URLBuilder() {
 
               <CardTypeTabs cardType={cardType} onChange={setCardType} />
 
+              {/* Global GitHub Username */}
+              <div className="pt-4 border-t border-card-border/30">
+                <label className="text-sm font-semibold text-text block mb-2">
+                  Global GitHub Username
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., octocat"
+                  value={globalUsername}
+                  onChange={(e) => setGlobalUsername(e.target.value)}
+                  className="w-full font-mono"
+                />
+                <p className="text-xs text-text-muted mt-1">
+                  Used for all card types. Saved to local storage.
+                </p>
+              </div>
+
               <div className="space-y-6">
                 {/* Stats */}
                 {cardType === "stats" && (
                   <StatsForm
-                    username={statsUsername}
                     title={statsTitle}
                     hide={statsHide}
                     show={statsShow}
-                    onUsernameChange={setStatsUsername}
                     onTitleChange={setStatsTitle}
                     onHideChange={setStatsHide}
                     onShowChange={setStatsShow}
@@ -361,11 +385,9 @@ export default function URLBuilder() {
                 {/* Pin */}
                 {cardType === "pin" && (
                   <PinForm
-                    username={pinUsername}
                     repo={pinRepo}
                     title={pinTitle}
                     showOwner={pinShowOwner}
-                    onUsernameChange={setPinUsername}
                     onRepoChange={setPinRepo}
                     onTitleChange={setPinTitle}
                     onShowOwnerChange={setPinShowOwner}
@@ -375,11 +397,9 @@ export default function URLBuilder() {
                 {/* Top Langs */}
                 {cardType === "top-langs" && (
                   <TopLangsForm
-                    username={langsUsername}
                     title={langsTitle}
                     layout={langsLayout}
                     langsCount={langsCount}
-                    onUsernameChange={setLangsUsername}
                     onTitleChange={setLangsTitle}
                     onLayoutChange={setLangsLayout}
                     onLangsCountChange={setLangsCount}
@@ -388,12 +408,7 @@ export default function URLBuilder() {
 
                 {/* Streak */}
                 {cardType === "streak" && (
-                  <StreakForm
-                    username={streakUsername}
-                    title={streakTitle}
-                    onUsernameChange={setStreakUsername}
-                    onTitleChange={setStreakTitle}
-                  />
+                  <StreakForm title={streakTitle} onTitleChange={setStreakTitle} />
                 )}
 
                 {/* Gist */}

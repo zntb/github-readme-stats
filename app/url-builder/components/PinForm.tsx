@@ -1,37 +1,24 @@
 import { FormGroup } from "./FormGroup";
 
 interface PinFormProps {
-  username: string;
   repo: string;
   title: string;
   showOwner: boolean;
-  onUsernameChange: (value: string) => void;
   onRepoChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onShowOwnerChange: (value: boolean) => void;
 }
 
 export function PinForm({
-  username,
   repo,
   title,
   showOwner,
-  onUsernameChange,
   onRepoChange,
   onTitleChange,
   onShowOwnerChange,
 }: PinFormProps) {
   return (
     <div className="space-y-5 animate-fade-in-up animate-delay-200">
-      <FormGroup label="GitHub Username *" description="Repository owner">
-        <input
-          type="text"
-          placeholder="e.g., octocat"
-          value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
-          className="font-mono"
-        />
-      </FormGroup>
       <FormGroup label="Repository *" description="Repository name">
         <input
           type="text"
