@@ -42,9 +42,7 @@ export const fetchOpenPRs = async (octokit, user, repo, reviewer) => {
         `
             {
               repository(owner: "${user}", name: "${repo}") {
-                open_prs: pullRequests(${
-                  endCursor ? `after: "${endCursor}", ` : ""
-                }
+                open_prs: pullRequests(${endCursor ? `after: "${endCursor}", ` : ""}
                   first: 100, states: OPEN, orderBy: {field: CREATED_AT, direction: DESC}) {
                   nodes {
                     number
@@ -109,15 +107,12 @@ export const pullsWithLabel = (pulls, label) => {
  * @returns {boolean} indicating if PR is stale.
  */
 const isStale = (pullRequest, staleDays) => {
-  const lastCommitDate = new Date(
-    pullRequest.commits.nodes[0].commit.pushedDate,
-  );
+  const lastCommitDate = new Date(pullRequest.commits.nodes[0].commit.pushedDate);
   if (pullRequest.reviews.nodes[0]) {
     const lastReviewDate = new Date(
       pullRequest.reviews.nodes.sort((a, b) => (a < b ? 1 : -1))[0].submittedAt,
     );
-    const lastUpdateDate =
-      lastCommitDate >= lastReviewDate ? lastCommitDate : lastReviewDate;
+    const lastUpdateDate = lastCommitDate >= lastReviewDate ? lastCommitDate : lastReviewDate;
     const now = new Date();
     return (now - lastUpdateDate) / (1000 * 60 * 60 * 24) >= staleDays;
   } else {
@@ -146,9 +141,7 @@ const run = async () => {
     const themePRs = pullsWithLabel(prs, "themes");
     const invalidThemePRs = pullsWithLabel(themePRs, "invalid");
     debug("Retrieving stale theme PRs...");
-    const staleThemePRs = invalidThemePRs.filter((pr) =>
-      isStale(pr, staleDays),
-    );
+    const staleThemePRs = invalidThemePRs.filter((pr) => isStale(pr, staleDays));
     const staleThemePRsNumbers = staleThemePRs.map((pr) => pr.number);
     debug(`Found ${staleThemePRs.length} stale theme PRs`);
 

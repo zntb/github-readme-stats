@@ -7,9 +7,7 @@ const LANGS_FILEPATH = "./src/common/languageColors.json";
 //Retrieve languages from github linguist repository yaml file
 //@ts-expect-error axios response typing
 axios
-  .get(
-    "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml",
-  )
+  .get("https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml")
   .then((response) => {
     //and convert them to a JS Object
     const languages = jsYaml.load(response.data);
@@ -23,8 +21,5 @@ axios
 
     //Debug Print
     //console.dir(languageColors);
-    fs.writeFileSync(
-      LANGS_FILEPATH,
-      JSON.stringify(languageColors, null, "    "),
-    );
+    fs.writeFileSync(LANGS_FILEPATH, JSON.stringify(languageColors, null, "    "));
   });
