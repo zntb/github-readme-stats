@@ -48,8 +48,8 @@ export function buildSingleCardUrl(
   }
 
   let endpoint = "/api";
-  // Use card's username for wakatime, otherwise use global username
-  const username = card.type === "wakatime" ? card.username : card.username || globalUsername;
+  // Use global username for all card types (per-card username field removed from Multi-Col builder)
+  const username = globalUsername;
 
   if (card.type === "stats") {
     if (!username) return "";

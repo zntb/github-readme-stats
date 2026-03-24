@@ -241,7 +241,7 @@ export default function URLBuilder() {
       valid = multiCards.some((c) => {
         if (c.type === "pin") return c.username && c.repo;
         if (c.type === "gist") return !!c.gistId;
-        return !!(c.username || globalUsername);
+        return !!globalUsername;
       });
     }
 

@@ -68,7 +68,7 @@ export function MultiColForm({
 
       {cards.length > 0 && multiUrls.length === 0 && (
         <p className="text-xs text-warning text-center pt-1">
-          Fill in the required fields (username / ID) for each card to generate a preview.
+          Fill in the global GitHub username above and any required fields for each card to generate a preview.
         </p>
       )}
     </div>
