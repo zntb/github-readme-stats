@@ -97,6 +97,7 @@ export interface MultiCard {
   gistId: string;
   layout: string;
   langsCount: string;
+  cardWidth: string;
 }
 
 export interface CardTypeTab {

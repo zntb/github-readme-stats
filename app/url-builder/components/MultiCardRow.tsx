@@ -136,6 +136,18 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
           )}
         </div>
       )}
+
+      {/* Card Width - per card */}
+      <div>
+        <label className="text-xs text-text-muted block mb-1">Card Width (px)</label>
+        <input
+          type="number"
+          placeholder="e.g., 500"
+          value={card.cardWidth}
+          onChange={(e) => onUpdate({ cardWidth: e.target.value })}
+          className="font-mono text-sm"
+        />
+      </div>
     </div>
   );
 }
