@@ -89,14 +89,16 @@ export function buildSingleCardUrl(
  *
  * Uses a fixed `height` on every <img> so all cards sit at the same row height
  * while each card renders at its natural width (aspect-ratio preserved).
- * GitHub renders consecutive inline <a><img /></a> blocks side by side.
+ * Wraps cards in a flex container for side-by-side layout.
  */
 export function buildMultiHtml(multiUrls: string[], cardHeight: string): string {
   if (multiUrls.length === 0) return "";
 
   const h = cardHeight && Number(cardHeight) > 0 ? cardHeight : "200";
 
-  return multiUrls
+  const cardsHtml = multiUrls
     .map((u) => `<a href="${u}"><img height="${h}" src="${u}" alt="GitHub Stats Card" /></a>`)
     .join("\n");
+
+  return `<div align="center" style="display: flex; justify-content: space-between;">\n${cardsHtml}\n</div>`;
 }
