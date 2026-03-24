@@ -12,8 +12,6 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
   const needsRepo = card.type === "pin";
   const needsGistId = card.type === "gist";
   const hasLayout = card.type === "top-langs" || card.type === "wakatime";
-  const usernameLabel = card.type === "wakatime" ? "WakaTime Username *" : "GitHub Username *";
-  const usernamePlaceholder = card.type === "wakatime" ? "WakaTime user" : "GitHub user";
 
   return (
     <div className="rounded-xl border border-card-border bg-bg-tertiary/40 p-4 space-y-3">
@@ -55,22 +53,17 @@ export function MultiCardRow({ card, index, onUpdate, onRemove, canRemove }: Mul
         </select>
       </div>
 
-      {/* Username field — always shown except for gist; for wakatime uses its own label */}
-      {card.type !== "gist" && (
+      {/* Wakatime username - only for wakatime cards */}
+      {card.type === "wakatime" && (
         <div>
-          <label className="text-xs text-text-muted block mb-1">{usernameLabel}</label>
+          <label className="text-xs text-text-muted block mb-1">WakaTime Username *</label>
           <input
             type="text"
-            placeholder={usernamePlaceholder}
+            placeholder="WakaTime user"
             value={card.username}
             onChange={(e) => onUpdate({ username: e.target.value })}
             className="font-mono text-sm"
           />
-          {card.type !== "wakatime" && (
-            <p className="text-xs text-text-muted mt-1">
-              Leave blank to use the global GitHub username above.
-            </p>
-          )}
         </div>
       )}
 
