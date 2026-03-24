@@ -100,7 +100,11 @@ const getProgressAnimation = ({ progress }) => `
   }
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getStyles = ({ titleColor, textColor, iconColor, ringColor, show_icons, progress }) => `
+  .stat {
+    font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${textColor};
+  }
   .stat {
     font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${textColor};
   }
@@ -291,7 +295,7 @@ const renderStatsCard = (stats, options = {}) => {
   );
   const progress = 100 - rank.percentile;
   const cssStyles = getStyles({
-    titleColor,
+    titleColor: titleColor,
     ringColor,
     textColor,
     iconColor,
