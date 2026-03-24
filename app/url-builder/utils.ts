@@ -285,6 +285,7 @@ export function buildMultiHtml(
   multiUrls: string[],
   multiCards: MultiCard[],
   multiCardWidth: string,
+  gap: string = "10px",
 ): string {
   if (multiUrls.length === 0) return "";
 
@@ -295,5 +296,5 @@ export function buildMultiHtml(
     })
     .join("\n");
 
-  return `<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;">\n${multiHtml}\n</div>`;
+  return `<div style="display: flex; gap: ${gap}; flex-wrap: wrap; align-items: center; justify-content: center">\n${multiHtml}\n</div>`;
 }
