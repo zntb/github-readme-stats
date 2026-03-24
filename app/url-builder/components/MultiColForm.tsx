@@ -4,59 +4,41 @@ import { FormGroup } from "./FormGroup";
 
 interface MultiColFormProps {
   cards: MultiCard[];
-  cardWidth: string;
+  cardHeight: string;
   multiUrls: string[];
   onAddCard: () => void;
   onRemoveCard: (id: string) => void;
   onUpdateCard: (id: string, updates: Partial<MultiCard>) => void;
-  onCardWidthChange: (value: string) => void;
-  gap: string;
-  onGapChange: (value: string) => void;
+  onCardHeightChange: (value: string) => void;
 }
 
 export function MultiColForm({
   cards,
-  cardWidth,
+  cardHeight,
   multiUrls,
   onAddCard,
   onRemoveCard,
   onUpdateCard,
-  onCardWidthChange,
-  gap,
-  onGapChange,
+  onCardHeightChange,
 }: MultiColFormProps) {
   return (
     <div className="space-y-4 animate-fade-in-up animate-delay-200">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">
-          Configure multiple cards to display side by side. They share the global theme/colors.
-        </p>
-      </div>
+      <p className="text-sm text-text-secondary">
+        Configure multiple cards to display side by side. They share the global theme and colors.
+        Each card renders at its natural width; the height below keeps them aligned.
+      </p>
 
       <FormGroup
-        label="README img height (px)"
-        description="Height applied to <img> tags in the HTML snippet for README alignment. Does not affect the live preview above."
+        label="Card height (px)"
+        description="All cards are rendered at this height. Width scales proportionally so each card shows at full width."
       >
         <input
           type="number"
-          value={cardWidth}
+          value={cardHeight}
           min="100"
-          max="500"
+          max="600"
           placeholder="200"
-          onChange={(e) => onCardWidthChange(e.target.value)}
-          className="font-mono"
-        />
-      </FormGroup>
-
-      <FormGroup
-        label="Gap between cards"
-        description="Space between cards in the HTML snippet (e.g., 10px, 20px)."
-      >
-        <input
-          type="text"
-          value={gap}
-          placeholder="10px"
-          onChange={(e) => onGapChange(e.target.value)}
+          onChange={(e) => onCardHeightChange(e.target.value)}
           className="font-mono"
         />
       </FormGroup>
@@ -86,7 +68,7 @@ export function MultiColForm({
 
       {cards.length > 0 && multiUrls.length === 0 && (
         <p className="text-xs text-warning text-center pt-1">
-          Fill in required fields (username/id) for each card to generate a preview.
+          Fill in the required fields (username / ID) for each card to generate a preview.
         </p>
       )}
     </div>

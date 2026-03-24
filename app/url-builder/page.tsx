@@ -92,7 +92,6 @@ export default function URLBuilder() {
       username: "",
       repo: "",
       gistId: "",
-      height: 200,
       layout: "normal",
       langsCount: "5",
     },
@@ -102,13 +101,12 @@ export default function URLBuilder() {
       username: "",
       repo: "",
       gistId: "",
-      height: 200,
       layout: "compact",
       langsCount: "8",
     },
   ]);
-  const [multiCardWidth, setMultiCardWidth] = useState("400");
-  const [multiGap, setMultiGap] = useState("10px");
+  /** Shared height (px) applied to all <img> tags in the README snippet */
+  const [multiCardHeight, setMultiCardHeight] = useState("200");
   const [htmlCopied, setHtmlCopied] = useState(false);
 
   // Load global username from localStorage on mount
@@ -134,7 +132,6 @@ export default function URLBuilder() {
         username: "",
         repo: "",
         gistId: "",
-        height: 200,
         layout: "normal",
         langsCount: "5",
       },
@@ -244,7 +241,7 @@ export default function URLBuilder() {
       valid = multiCards.some((c) => {
         if (c.type === "pin") return c.username && c.repo;
         if (c.type === "gist") return !!c.gistId;
-        return !!c.username;
+        return !!(c.username || globalUsername);
       });
     }
 
@@ -309,8 +306,8 @@ export default function URLBuilder() {
 
   const multiValid = cardType === "multi" && multiUrls.length > 0;
 
-  // Generate HTML for multi-col
-  const multiHtmlSnippet = multiValid ? buildMultiHtml(multiUrls, multiCards, multiCardWidth, multiGap) : "";
+  // Generate HTML for multi-col — single shared height, no gap hack
+  const multiHtmlSnippet = multiValid ? buildMultiHtml(multiUrls, multiCardHeight) : "";
 
   const copyUrl = async () => {
     if (valid && url) {
@@ -438,14 +435,12 @@ export default function URLBuilder() {
                 {cardType === "multi" && (
                   <MultiColForm
                     cards={multiCards}
-                    cardWidth={multiCardWidth}
+                    cardHeight={multiCardHeight}
                     multiUrls={multiUrls}
                     onAddCard={addMultiCard}
                     onRemoveCard={removeMultiCard}
                     onUpdateCard={updateMultiCard}
-                    onCardWidthChange={setMultiCardWidth}
-                    gap={multiGap}
-                    onGapChange={setMultiGap}
+                    onCardHeightChange={setMultiCardHeight}
                   />
                 )}
               </div>
