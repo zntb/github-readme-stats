@@ -116,6 +116,7 @@ describe("Fetch Cards", () => {
       try {
         await axios.get(VERCEL_PREVIEW_URL, { timeout: 2000 });
         serverAvailable = true;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         serverAvailable = false;
       }
