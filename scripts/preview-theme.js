@@ -20,8 +20,7 @@ const COMMENTER = "github-actions[bot]";
 
 const COMMENT_TITLE = "Automated Theme Preview";
 const THEME_PR_FAIL_TEXT = ":x: Theme PR does not adhere to our guidelines.";
-const THEME_PR_SUCCESS_TEXT =
-  ":heavy_check_mark: Theme PR does adhere to our guidelines.";
+const THEME_PR_SUCCESS_TEXT = ":heavy_check_mark: Theme PR does adhere to our guidelines.";
 const FAIL_TEXT = `
   \rUnfortunately, your theme PR contains an error or does not adhere to our [theme guidelines](https://github.com/zntb/github-readme-stats/blob/master/CONTRIBUTING.md#themes-contribution). Please fix the issues below, and we will review your\
   \r PR again. This pull request will **automatically close in 20 days** if no changes are made. After this time, you must re-open the PR for it to be reviewed.
@@ -106,12 +105,8 @@ const getCommenter = () => {
  */
 const isPreviewComment = (inputs, comment) => {
   return (
-    (inputs.commentAuthor && comment.user
-      ? comment.user.login === inputs.commentAuthor
-      : true) &&
-    (inputs.bodyIncludes && comment.body
-      ? comment.body.includes(inputs.bodyIncludes)
-      : true)
+    (inputs.commentAuthor && comment.user ? comment.user.login === inputs.commentAuthor : true) &&
+    (inputs.bodyIncludes && comment.body ? comment.body.includes(inputs.bodyIncludes) : true)
   );
 };
 
@@ -141,9 +136,7 @@ const findComment = async (octokit, issueNumber, owner, repo, commenter) => {
     octokit.rest.issues.listComments,
     parameters,
   )) {
-    const comment = comments.find((comment) =>
-      isPreviewComment(inputs, comment),
-    );
+    const comment = comments.find((comment) => isPreviewComment(inputs, comment));
     if (comment) {
       debug(`Found theme preview comment: ${inspect(comment)}`);
       return comment;
@@ -166,14 +159,7 @@ const findComment = async (octokit, issueNumber, owner, repo, commenter) => {
  * @param {string} body Comment body.
  * @returns {string} The comment URL.
  */
-const upsertComment = async (
-  octokit,
-  issueNumber,
-  repo,
-  owner,
-  commentId,
-  body,
-) => {
+const upsertComment = async (octokit, issueNumber, repo, owner, commentId, body) => {
   let resp;
   if (commentId === undefined) {
     resp = await octokit.rest.issues.createComment({
@@ -204,14 +190,7 @@ const upsertComment = async (
  * @param {string} reason The reason for the review.
  * @returns {Promise<void>} Promise.
  */
-const addReview = async (
-  octokit,
-  prNumber,
-  owner,
-  repo,
-  reviewState,
-  reason,
-) => {
+const addReview = async (octokit, prNumber, owner, repo, reviewState, reason) => {
   await octokit.rest.pulls.createReview({
     owner,
     repo,
@@ -327,9 +306,7 @@ const parseJSON = (json) => {
     if (typeof parsedJson === "object") {
       return parsedJson;
     } else {
-      throw new IncorrectJsonFormatError(
-        "PR diff is not a valid theme JSON object.",
-      );
+      throw new IncorrectJsonFormatError("PR diff is not a valid theme JSON object.");
     }
   } catch (error) {
     void error;
@@ -357,9 +334,7 @@ const parseJSON = (json) => {
     try {
       return Hjson.parse(parsedJson);
     } catch (error) {
-      throw new IncorrectJsonFormatError(
-        `Theme JSON file could not be parsed: ${error.message}`,
-      );
+      throw new IncorrectJsonFormatError(`Theme JSON file could not be parsed: ${error.message}`);
     }
   }
 };
@@ -411,13 +386,7 @@ export const run = async () => {
       },
     });
     debug("Retrieve preview-theme comment...");
-    const comment = await findComment(
-      OCTOKIT,
-      PULL_REQUEST_ID,
-      OWNER,
-      REPO,
-      commenter,
-    );
+    const comment = await findComment(OCTOKIT, PULL_REQUEST_ID, OWNER, REPO, commenter);
 
     // Retrieve theme changes from the PR diff.
     debug("Retrieve themes...");
@@ -435,19 +404,13 @@ export const run = async () => {
       )
       .join("");
     const themeObject = parseJSON(content);
-    if (
-      Object.keys(themeObject).every(
-        (key) => typeof themeObject[key] !== "object",
-      )
-    ) {
+    if (Object.keys(themeObject).every((key) => typeof themeObject[key] !== "object")) {
       throw new Error("PR diff is not a valid theme JSON object.");
     }
 
     // Loop through themes and create theme preview body.
     debug("Create theme preview body...");
-    const themeValid = Object.fromEntries(
-      Object.keys(themeObject).map((name) => [name, true]),
-    );
+    const themeValid = Object.fromEntries(Object.keys(themeObject).map((name) => [name, true]));
     let previewBody = "";
     for (const theme in themeObject) {
       debug(`Create theme preview for ${theme}...`);
@@ -471,29 +434,21 @@ export const run = async () => {
       debug("Theme preview body: Check if the theme colors are valid...");
       let invalidColors = false;
       if (colors) {
-        const missingKeys = REQUIRED_COLOR_PROPS.filter(
-          (x) => !Object.keys(colors).includes(x),
-        );
-        const extraKeys = Object.keys(colors).filter(
-          (x) => !ACCEPTED_COLOR_PROPS.includes(x),
-        );
+        const missingKeys = REQUIRED_COLOR_PROPS.filter((x) => !Object.keys(colors).includes(x));
+        const extraKeys = Object.keys(colors).filter((x) => !ACCEPTED_COLOR_PROPS.includes(x));
         if (missingKeys.length > 0 || extraKeys.length > 0) {
           for (const missingKey of missingKeys) {
             errors.push(`Theme color properties \`${missingKey}\` are missing`);
           }
 
           for (const extraKey of extraKeys) {
-            warnings.push(
-              `Theme color properties \`${extraKey}\` is not supported`,
-            );
+            warnings.push(`Theme color properties \`${extraKey}\` is not supported`);
           }
           invalidColors = true;
         } else {
           for (const [colorKey, colorValue] of Object.entries(colors)) {
             if (colorValue[0] === "#") {
-              errors.push(
-                `Theme color property \`${colorKey}\` should not start with '#'`,
-              );
+              errors.push(`Theme color property \`${colorKey}\` should not start with '#'`);
               invalidColors = true;
             } else if (colorValue.length > COLOR_PROPS[colorKey]) {
               errors.push(
@@ -519,9 +474,7 @@ export const run = async () => {
       if (invalidColors) {
         themeValid[theme] = false;
         previewBody += `
-          \r### ${
-            themeName.charAt(0).toUpperCase() + themeName.slice(1)
-          } theme preview
+          \r### ${themeName.charAt(0).toUpperCase() + themeName.slice(1)} theme preview
           
           \r${warnings.map((warning) => `- :warning: ${warning}.\n`).join("")}
           \r${errors.map((error) => `- :x: ${error}.\n`).join("")}
@@ -555,9 +508,7 @@ export const run = async () => {
         color2 = color2.length === 4 ? color2.slice(0, 3) : color2.slice(0, 6);
         if (!ccc.isLevelAA(`#${color1}`, `#${color2}`)) {
           const permalink = getWebAimLink(color1, color2);
-          warnings.push(
-            `\`${item}\` does not pass [AA contrast ratio](${permalink})`,
-          );
+          warnings.push(`\`${item}\` does not pass [AA contrast ratio](${permalink})`);
           themeValid[theme] = false;
         }
       });
@@ -565,9 +516,7 @@ export const run = async () => {
       // Create theme preview body.
       debug("Theme preview body: Create theme preview body...");
       previewBody += `
-        \r### ${
-          themeName.charAt(0).toUpperCase() + themeName.slice(1)
-        } theme preview
+        \r### ${themeName.charAt(0).toUpperCase() + themeName.slice(1)} theme preview
         
         \r${warnings.map((warning) => `- :warning: ${warning}.\n`).join("")}
 
@@ -591,9 +540,7 @@ export const run = async () => {
       }
       \r## Test results
       \r${Object.entries(themeValid)
-        .map(
-          ([key, value]) => `- ${value ? ":heavy_check_mark:" : ":x:"} ${key}`,
-        )
+        .map(([key, value]) => `- ${value ? ":heavy_check_mark:" : ":x:"} ${key}`)
         .join("\r")}
 
       \r${
@@ -629,29 +576,13 @@ export const run = async () => {
     );
     const themesValid = Object.values(themeValid).every((value) => value);
     const reviewState = themesValid ? "APPROVE" : "REQUEST_CHANGES";
-    const reviewReason = themesValid
-      ? undefined
-      : INVALID_REVIEW_COMMENT(comment_url);
+    const reviewReason = themesValid ? undefined : INVALID_REVIEW_COMMENT(comment_url);
     if (DRY_RUN) {
       info(`DRY_RUN: Review state: ${reviewState}`);
       info(`DRY_RUN: Review reason: ${reviewReason}`);
     } else {
-      await addReview(
-        OCTOKIT,
-        PULL_REQUEST_ID,
-        OWNER,
-        REPO,
-        reviewState,
-        reviewReason,
-      );
-      await addRemoveLabel(
-        OCTOKIT,
-        PULL_REQUEST_ID,
-        OWNER,
-        REPO,
-        "invalid",
-        !themesValid,
-      );
+      await addReview(OCTOKIT, PULL_REQUEST_ID, OWNER, REPO, reviewState, reviewReason);
+      await addRemoveLabel(OCTOKIT, PULL_REQUEST_ID, OWNER, REPO, "invalid", !themesValid);
     }
   } catch (error) {
     debug("Set review state to `REQUEST_CHANGES` and add `invalid` label...");
@@ -659,24 +590,26 @@ export const run = async () => {
       info(`DRY_RUN: Review state: REQUEST_CHANGES`);
       info(`DRY_RUN: Review reason: ${error.message}`);
     } else {
-      await addReview(
-        OCTOKIT,
-        PULL_REQUEST_ID,
-        OWNER,
-        REPO,
-        "REQUEST_CHANGES",
-        "**Something went wrong in the theme preview action:** `" +
-          error.message +
-          "`",
-      );
-      await addRemoveLabel(
-        OCTOKIT,
-        PULL_REQUEST_ID,
-        OWNER,
-        REPO,
-        "invalid",
-        true,
-      );
+      // Only attempt to add review if OCTOKIT was initialized.
+      // This can fail if the error occurred before OCTOKIT initialization.
+      if (OCTOKIT) {
+        await addReview(
+          OCTOKIT,
+          PULL_REQUEST_ID,
+          OWNER,
+          REPO,
+          "REQUEST_CHANGES",
+          "**Something went wrong in the theme preview action:** `" + error.message + "`",
+        );
+        await addRemoveLabel(OCTOKIT, PULL_REQUEST_ID, OWNER, REPO, "invalid", true);
+      } else {
+        // OCTOKIT not initialized - likely running outside GitHub Actions context.
+        // Print error message instead of trying to post review.
+        info(`Error: ${error.message}`);
+        info(
+          "Note: This script is designed to run in GitHub Actions. Use the workflow at .github/workflows/preview-theme.yml",
+        );
+      }
     }
     setFailed(error.message);
   }
