@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { renderStatsCard, renderTopLanguages, renderStreakCard, renderGistCard, renderRepoCard, renderWakatimeCard } from "@/src/cards/index.js";
 import {
-  buildCacheControl,
-  buildErrorCacheControl,
-  CACHE_TTL,
-} from "@/src/common/cache.js";
+  renderStatsCard,
+  renderTopLanguages,
+  renderStreakCard,
+  renderGistCard,
+  renderRepoCard,
+  renderWakatimeCard,
+} from "@/src/cards/index.js";
+import { buildCacheControl, buildErrorCacheControl, CACHE_TTL } from "@/src/common/cache.js";
 import { renderError, renderMultiColumnLayout } from "@/src/common/render.js";
 import { fetchStats } from "@/src/fetchers/stats.js";
 import { fetchTopLanguages } from "@/src/fetchers/top-languages.js";
@@ -58,7 +61,7 @@ async function renderCard(cardConfig: {
           false,
           false,
           false,
-          0
+          0,
         );
         return renderStatsCard(stats, {
           hide: parseArray(params.hide || ""),
@@ -179,7 +182,7 @@ export async function GET(request: NextRequest) {
         message: "Missing cards parameter",
         secondaryMessage: "Please provide card configurations",
       }),
-      { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } }
+      { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } },
     );
   }
 
@@ -194,7 +197,7 @@ export async function GET(request: NextRequest) {
           message: "Invalid cards format",
           secondaryMessage: "Cards must be a valid JSON array",
         }),
-        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } }
+        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } },
       );
     }
 
@@ -204,14 +207,12 @@ export async function GET(request: NextRequest) {
           message: "No cards provided",
           secondaryMessage: "Please provide at least one card",
         }),
-        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } }
+        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } },
       );
     }
 
     // Render each card
-    const renderedCards = await Promise.all(
-      cardConfigs.map((config) => renderCard(config))
-    );
+    const renderedCards = await Promise.all(cardConfigs.map((config) => renderCard(config)));
 
     // Filter out null cards (failed to render)
     const validCards = renderedCards.filter(Boolean);
@@ -222,7 +223,7 @@ export async function GET(request: NextRequest) {
           message: "Failed to render cards",
           secondaryMessage: "Check card configurations",
         }),
-        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } }
+        { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } },
       );
     }
 
@@ -249,7 +250,7 @@ export async function GET(request: NextRequest) {
         message: "An unexpected error occurred",
         secondaryMessage: error.message || "Unknown error",
       }),
-      { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } }
+      { headers: { "Content-Type": "image/svg+xml", "Cache-Control": buildErrorCacheControl() } },
     );
   }
 }
